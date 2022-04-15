@@ -206,7 +206,7 @@
           - { name: 'mergetool.vscode.cmd', value: 'code --wait $MERGED' }
       
     - block:
-      - name: Instalação da chave pgp do Google Chrome
+      - name: Instalação da chave PGP do Google Chrome
         become: true
         apt_key:
           url: 'https://dl.google.com/linux/linux_signing_key.pub'
@@ -225,7 +225,7 @@
           update_cache: yes
     
     - block:
-      - name: Instalação da chave pgp do Docker
+      - name: Instalação da chave PGP do Docker
         become: true
         apt_key:
           url: 'https://download.docker.com/linux/ubuntu/gpg'
@@ -272,3 +272,54 @@
           path: /home/{{ ansible_user_id }}/.zshrc
           regexp: '^plugins='
           line: 'plugins=(git docker docker-compose mvn nvm npm yarn flutter)'
+
+    - block:
+      - name: 'Instalação da chave PGP da Microsoft'
+        become: true
+        apt_key:
+          url: 'https://packages.microsoft.com/keys/microsoft.asc'
+          state: present
+      - name: Instalação do repositório do Visual Studio Code
+        become: true
+        apt_repository:
+          repo: 'deb [arch=amd64] https://packages.microsoft.com/repos/code stable main'
+          state: present
+          filename: vscode
+      - name: Instalação do repositório do Microsoft Teams
+        become: true
+        apt_repository:
+          repo: 'deb [arch=amd64] https://packages.microsoft.com/repos/ms-teams stable main'
+          state: present
+          filename: teams
+      - name: Instalação do repositório do Microsoft Edge
+        become: true
+        apt_repository:
+          repo: 'deb [arch=amd64] https://packages.microsoft.com/repos/edge stable main'
+          state: present
+          filename: microsoft-edge
+      - name: Instalação do Visual Studio Code, Microsoft Teams e Microsoft Edge Stable
+        become: true
+        apt:
+          name: code
+        loop:
+          - code
+          - teams
+          - microsoft-edge-stable
+      - name: Instalação das extensões para o Visual Studio Code
+        shell:
+          cmd: code --install-extension '{{ item }}'
+        loop: 
+          - dbaeumer.vscode-eslint
+          - Dart-Code.flutter
+          - Dart-Code.dart-code
+          - ms-azuretools.vscode-docker
+          - donjayamanne.githistory
+          - eamodio.gitlens
+          - GitHub.copilot
+          - GabrielBB.vscode-lombok
+          - PKief.material-icon-theme
+          - ms-edgedevtools.vscode-edge-devtools
+          - vscjava.vscode-spring-boot-dashboard
+          - rangav.vscode-thunder-client
+          - vscjava.vscode-java-pack
+          - rocketseat.theme-omni
