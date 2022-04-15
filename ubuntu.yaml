@@ -183,3 +183,25 @@
       #   loop:
       #     - { src: https://raw.githubusercontent.com/richardmadureira/workstation-ubuntu/main/resources/settings.xml, dest: /home/richard/.m2/settings.xml}
       #     - { src: https://raw.githubusercontent.com/richardmadureira/workstation-ubuntu/main/resources/settings.xml, dest: /home/richard/.m2/toolchains.xml}
+
+      - name: 'Instalação do Keystore Explorer'
+        apt:
+          deb: 'https://github.com/kaikramer/keystore-explorer/releases/download/v5.5.1/kse_5.5.1_all.deb'
+          creates: '/opt/kse'
+
+      - name: 'Configuração do git (.gitconfig)'
+        git_config:
+          scope: global
+          name: '{{ item.name }}'
+          value: '{{ item.value }}'
+        loop:
+          - { name: 'user.name', value: 'Richard Mendes Madureira' }
+          - { name: 'user.email', value: 'richard.madureira@dataprev.gov.br' }
+          - { name: 'http.sslVerify', value: 'false' }
+          - { name: 'credential.helper', value:  'cache --timeout=36000' }
+          - { name: 'core.editor', value:  'code --wait --new-window' }
+          - { name: 'diff.tool', value: 'vscode' }
+          - { name: 'difftool.vscode.cmd', value: 'code --wait --diff $LOCAL $REMOTE' }
+          - { name: 'difftool.prompt', value: 'false' }
+          - { name: 'merge.tool', value: 'vscode' }
+          - { name: 'mergetool.vscode.cmd', value: 'code --wait $MERGED' }
