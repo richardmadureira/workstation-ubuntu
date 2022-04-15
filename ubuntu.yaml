@@ -334,3 +334,34 @@
     #     become: true
     #     apt:
     #       name: ulauncher
+
+    - block:
+      - name: Verificação se  Oh-My-zsh está instalado
+        command: test -d /home/{{ ansible_user_id }}/.oh-my-zsh
+        register: ohmyzsh
+        ignore_errors: true
+      - name: Instalando Oh-My-zsh
+        shell:
+          cmd: 'curl -fsL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh | bash'
+          warn: false
+        when: ohmyzsh.rc != 0
+      - name: Alterando o Default shell para  ZSH
+        become: yes
+        user:
+          name: '{{ ansible_user_id }}'
+          shell: /bin/zsh
+      - name: Changing Default ZSH Theme to Agnoster
+        lineinfile:
+          path: /home/{{ ansible_user_id }}/.zshrc
+          regexp: '^ZSH_THEME='
+          line: 'ZSH_THEME="agnoster"'
+      - name: Criação do diretório ZSH Completion
+        file:
+          path: /home/{{ ansible_user_id }}/.oh-my-zsh/completions
+          state: directory
+          mode: 0755
+      - name: Adicionando autoload ao compinit
+        lineinfile:
+          path: /home/{{ ansible_user_id }}/.zshrc
+          line: 'autoload -U compinit && compinit'
+          state: present
