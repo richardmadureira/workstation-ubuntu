@@ -365,3 +365,28 @@
           path: /home/{{ ansible_user_id }}/.zshrc
           line: 'autoload -U compinit && compinit'
           state: present
+
+    - block:
+      - name: Instalação do Spotify
+        snap:
+          name: spotify
+          classic: yes
+      # - name: Instalação da chave do spotify
+      #   become: true
+      #   apt_key:
+      #     url: 'https://download.spotify.com/debian/pubkey_5E3C45D7B312C643.gpg'
+      #     state: present
+      # - name: Instalação do repositório do spotify
+      #   become: true
+      #   apt_repository:
+      #     repo: 'deb http://repository.spotify.com stable non-free'
+      #     state: present
+      #     filename: spotify
+      # - name: Instalação do Spotify
+      #   become: true
+      #   apt:
+      #     name: spotify-client
+      #     state: latest
+      #     update_cache: yes
+      #     install_recommends: yes
+          
