@@ -187,7 +187,6 @@
       - name: 'Instalação do Keystore Explorer'
         apt:
           deb: 'https://github.com/kaikramer/keystore-explorer/releases/download/v5.5.1/kse_5.5.1_all.deb'
-          creates: '/opt/kse'
 
       - name: 'Configuração do git (.gitconfig)'
         git_config:
@@ -205,3 +204,22 @@
           - { name: 'difftool.prompt', value: 'false' }
           - { name: 'merge.tool', value: 'vscode' }
           - { name: 'mergetool.vscode.cmd', value: 'code --wait $MERGED' }
+      
+    - block:
+      - name: 'Google Chrome'
+        become: true
+        apt_key:
+          url: 'https://dl.google.com/linux/linux_signing_key.pub'
+          state: present
+      - name: 'Instalação do repositório do Google Chrome'
+        become: true
+        apt_repository:
+          repo: 'deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main'
+          state: present
+          filename: google-chrome
+      - name: 'Instalação do Google Chrome'
+        become: true
+        apt:
+          name: google-chrome-stable
+          state: latest
+          update_cache: yes
