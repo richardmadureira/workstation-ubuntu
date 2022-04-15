@@ -2,6 +2,65 @@
 - name: Preparação da Estação de Trabalho
   hosts: localhost
   connection: local
+  vars:
+    maven_home_dir: /opt/programas/apache-maven-3.8.5
+    http_proxy: http://proxy.example.com:8080  
+    maven_settings: |
+      <?xml version="1.0" encoding="utf-8"?>
+      <settings>
+        <mirrors>
+          <mirror>
+            <id>mirror-dataprev</id>
+            <name>Maven Public Dtaprev</name>
+            <url>http://www-bin.prevnet/repository/public/</url>
+            <mirrorOf>*</mirrorOf>
+          </mirror>
+          <mirror>
+            <id>nexus</id>
+            <mirrorOf>nexus</mirrorOf>
+            <url>http://internal/nexus/content/repositories/thirdparty</url>
+          </mirror>
+          <mirror>
+            <id>google</id>
+            <mirrorOf>google</mirrorOf>
+            <url>http://google-maven-repository.googlecode.com/svn/repository</url>
+          </mirror>  
+        </mirrors>
+      </settings>
+    maven_toolchains: |
+      <?xml version="1.0" encoding="UTF8"?>
+      <toolchains>
+        <toolchain>
+          <type>jdk</type>
+          <provides>
+            <version>1.8</version>
+            <vendor>openjdk</vendor>
+          </provides>
+          <configuration>
+            <jdkHome>/opt/programas/jdk1.8.0_131/</jdkHome>
+          </configuration>
+        </toolchain>
+        <toolchain>
+          <type>jdk</type>
+          <provides>
+            <version>11</version>
+            <vendor>openjdk</vendor>
+          </provides>
+          <configuration>
+            <jdkHome>/usr/lib/jvm/java-11-openjdk-amd64/</jdkHome>
+          </configuration>
+        </toolchain>
+        <toolchain>
+          <type>jdk</type>
+          <provides>
+            <version>17</version>
+            <vendor>oracle</vendor>
+          </provides>
+          <configuration>
+            <jdkHome>/usr/lib/jvm/jdk-17</jdkHome>
+          </configuration>
+        </toolchain>  
+      </toolchains>
   tasks:
 
     - name: Atualizando Sistema Operacional
@@ -13,4 +72,114 @@
         install_recommends: yes
         autoremove: yes
 
+    - name: Instalando aplicações que estão nos repositórios padrões do Ubuntu
+      become: true
+      apt:
+        name: '{{ item }}'
+        install_recommends: yes
+        state: present
+      loop:
+        - software-properties-common
+        - apt-transport-https
+        - ca-certificates
+        - curl
+        - gnupg
+        - lsb-release
+        - git
+        - openjdk-11-jdk
+        - ubuntu-restricted-extras
+        - ubuntu-restricted-addons
+        - geany
+        - meld
+        - wget
+        - fonts-firacode
+        - fonts-powerline
+        - fonts-font-awesome
+        - gnome-tweaks
+        - vlc
+        - gimp
+        - inkscape
+        - ttf-mscorefonts-installer
+        - gparted
+        - stacer
+        - blender
+        - filezilla
+        - cpu-x
+        - htop
+        - terminator
+        - openconnect
+        - network-manager-openconnect
+        - network-manager-openconnect-gnome
+        - libglu1-mesa
+        - clang
+        - cmake
+        - ninja-build
+        - pkg-config
+        - libgtk-3-dev
+        - liblzma-dev
+        - zsh
+        - krita
 
+    - name: 'Criação dos diretórios necessários'
+      file:
+        path: '{{ item }}'
+        state: directory
+        mode: 0775
+      loop:
+        - '/opt/programas' 
+        - '/dtp'
+        - '/home/richard/.m2'
+
+    - block:
+      - name: 'Instalação do Eclipse Java EE'
+        unarchive:
+          src: 'https://eclipse.c3sl.ufpr.br/technology/epp/downloads/release/2022-03/R/eclipse-jee-2022-03-R-linux-gtk-x86_64.tar.gz'
+          dest: /opt/programas
+          remote_src: yes
+          creates: /opt/programas/eclipse
+      - name: Alteração das configurações de memória do Eclipse (eclipse.ini)
+        lineinfile:
+          dest: /opt/programas/eclipse/eclipse.ini
+          regexp: '{{ item.regexp }}'
+          line: '{{ item.line }}'
+          state: present
+        loop:
+          - { regexp: '^-Xms', line: '-Xms512m' }
+          - { regexp: '^-Xmx', line: '-Xmx4096m' }
+
+    - block:
+      - name: 'Instalação do Apache Maven'
+        unarchive:
+          src: 'https://dlcdn.apache.org/maven/maven-3/3.8.5/binaries/apache-maven-3.8.5-bin.tar.gz'
+          dest: '/opt/programas'
+          remote_src: yes
+          creates: '/opt/programas/apache-maven-3.8.5'
+
+      - name: 'Criação do arquivo settings.xml'
+        copy:
+          content: '{{ item.content }}'
+          dest: '{{ item.dest }}'
+        loop:
+          - { content: '{{ maven_settings }}', dest: '/home/richard/.m2/settings.xml'}
+          - { content: '{{ maven_toolchains }}', dest: '/home/richard/.m2/toolchains.xml'}
+
+      - name: 'Configuração de variáveis ambientes'
+        lineinfile:
+          dest: /home/richard/.zshrc
+          line: '{{ item.line }}'
+          regexp: '{{ item.regexp }}'
+          insertafter: 'EOF'
+          state: present
+        loop:
+          - { regexp: '^export MAVEN_HOME', line: 'export MAVEN_HOME="/opt/programas/apache-maven-3.8.5"' }
+          - { regexp: '^export PATH', line: 'export PATH="$PATH:$MAVEN_HOME/bin"' }
+
+      # opção para copiar diretamente do github (deixar o repositório publico)
+      # - name: 'Criação do arquivo settings.xml'
+      #   copy:
+      #     src: '{{ item.src }}'
+      #     dest: '{{ item.dest }}'
+      #     remote_src: yes
+      #   loop:
+      #     - { src: https://raw.githubusercontent.com/richardmadureira/workstation-ubuntu/main/resources/settings.xml, dest: /home/richard/.m2/settings.xml}
+      #     - { src: https://raw.githubusercontent.com/richardmadureira/workstation-ubuntu/main/resources/settings.xml, dest: /home/richard/.m2/toolchains.xml}

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<settings>
+  <mirrors>
+    <mirror>
+      <id>mirror-dataprev</id>
+      <name>Maven Public Dtaprev</name>
+      <url>http://www-bin.prevnet/repository/public/</url>
+      <mirrorOf>*</mirrorOf>
+    </mirror>
+    <mirror>
+      <id>nexus</id>
+      <mirrorOf>nexus</mirrorOf>
+      <url>http://internal/nexus/content/repositories/thirdparty</url>
+    </mirror>
+    <mirror>
+      <id>google</id>
+      <mirrorOf>google</mirrorOf>
+      <url>http://google-maven-repository.googlecode.com/svn/repository</url>
+    </mirror>  
+  </mirrors>
+</settings>
