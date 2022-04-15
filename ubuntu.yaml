@@ -206,20 +206,69 @@
           - { name: 'mergetool.vscode.cmd', value: 'code --wait $MERGED' }
       
     - block:
-      - name: 'Google Chrome'
+      - name: Instalação da chave pgp do Google Chrome
         become: true
         apt_key:
           url: 'https://dl.google.com/linux/linux_signing_key.pub'
           state: present
-      - name: 'Instalação do repositório do Google Chrome'
+      - name: Instalação do repositório do Google Chrome
         become: true
         apt_repository:
           repo: 'deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main'
           state: present
           filename: google-chrome
-      - name: 'Instalação do Google Chrome'
+      - name: Instalação do Google Chrome Stable
         become: true
         apt:
           name: google-chrome-stable
           state: latest
           update_cache: yes
+    
+    - block:
+      - name: Instalação da chave pgp do Docker
+        become: true
+        apt_key:
+          url: 'https://download.docker.com/linux/ubuntu/gpg'
+          state: present
+      - name: Instalação do repositório do docker
+        become: true
+        apt_repository:
+          repo: 'deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable'
+          state: present
+          filename: docker-ce
+      - name: Instalação do Docker
+        become: true
+        apt:
+          name: '{{ item }}'
+          install_recommends: yes
+        loop:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+      - name: Inclusão de usuário existente no grupo docker
+        become: yes
+        user: 
+          name: '{{ ansible_user_id }}'
+          groups: docker
+          append: yes
+      - name: Instalação do Docker Compose
+        become: true
+        get_url:
+          url: 'https://github.com/docker/compose/releases/download/1.29.2/docker-compose-Linux-x86_64'
+          dest: '/usr/local/bin/docker-compose'
+          mode: 755
+      - name: Instalação do Docker Machine Bash Completion
+        become: true
+        get_url:
+          url: 'https://raw.githubusercontent.com/docker/machine/v0.16.2/contrib/completion/bash/docker-machine.bash'
+          dest: '/etc/bash_completion.d/docker-machine'
+      - name: Instalação do Docker-Compose Bash Completion
+        become: true
+        get_url:
+          url: 'https://raw.githubusercontent.com/docker/compose/1.29.2/contrib/completion/bash/docker-compose'
+          dest: '/etc/bash_completion.d/docker-compose'
+      - name: Instalação do Docker-Compose e Docker Machine no Zsh Completion
+        lineinfile:
+          path: /home/{{ ansible_user_id }}/.zshrc
+          regexp: '^plugins='
+          line: 'plugins=(git docker docker-compose mvn nvm npm yarn flutter)'
