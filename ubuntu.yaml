@@ -120,7 +120,7 @@
         - zsh
         - krita
 
-    - name: 'Criação dos diretórios necessários'
+    - name: Criação dos diretórios necessários
       file:
         path: '{{ item }}'
         state: directory
@@ -131,7 +131,7 @@
         - '/home/richard/.m2'
 
     - block:
-      - name: 'Instalação do Eclipse Java EE'
+      - name: Instalação do Eclipse Java EE
         unarchive:
           src: 'https://eclipse.c3sl.ufpr.br/technology/epp/downloads/release/2022-03/R/eclipse-jee-2022-03-R-linux-gtk-x86_64.tar.gz'
           dest: /opt/programas
@@ -148,14 +148,14 @@
           - { regexp: '^-Xmx', line: '-Xmx4096m' }
 
     - block:
-      - name: 'Instalação do Apache Maven'
+      - name: Instalação do Apache Maven
         unarchive:
           src: 'https://dlcdn.apache.org/maven/maven-3/3.8.5/binaries/apache-maven-3.8.5-bin.tar.gz'
           dest: '/opt/programas'
           remote_src: yes
           creates: '/opt/programas/apache-maven-3.8.5'
 
-      - name: 'Criação do arquivo settings.xml'
+      - name: Criação do arquivo settings.xml
         copy:
           content: '{{ item.content }}'
           dest: '{{ item.dest }}'
@@ -163,7 +163,7 @@
           - { content: '{{ maven_settings }}', dest: '/home/richard/.m2/settings.xml'}
           - { content: '{{ maven_toolchains }}', dest: '/home/richard/.m2/toolchains.xml'}
 
-      - name: 'Configuração de variáveis ambientes'
+      - name: Configuração de variáveis ambientes
         lineinfile:
           dest: /home/richard/.zshrc
           line: '{{ item.line }}'
@@ -184,11 +184,11 @@
       #     - { src: https://raw.githubusercontent.com/richardmadureira/workstation-ubuntu/main/resources/settings.xml, dest: /home/richard/.m2/settings.xml}
       #     - { src: https://raw.githubusercontent.com/richardmadureira/workstation-ubuntu/main/resources/settings.xml, dest: /home/richard/.m2/toolchains.xml}
 
-      - name: 'Instalação do Keystore Explorer'
+      - name: Instalação do Keystore Explorer
         apt:
           deb: 'https://github.com/kaikramer/keystore-explorer/releases/download/v5.5.1/kse_5.5.1_all.deb'
 
-      - name: 'Configuração do git (.gitconfig)'
+      - name: Configuração do git (.gitconfig)
         git_config:
           scope: global
           name: '{{ item.name }}'
@@ -274,7 +274,7 @@
           line: 'plugins=(git docker docker-compose mvn nvm npm yarn flutter)'
 
     - block:
-      - name: 'Instalação da chave PGP da Microsoft'
+      - name: Instalação da chave PGP da Microsoft
         become: true
         apt_key:
           url: 'https://packages.microsoft.com/keys/microsoft.asc'
@@ -323,3 +323,14 @@
           - rangav.vscode-thunder-client
           - vscjava.vscode-java-pack
           - rocketseat.theme-omni
+
+    # com problemas... :(
+    # - block:
+    #   - name: Instalação do repositório Ulauncher
+    #     become: true
+    #     apt_repository:
+    #       repo: 'ppa:agornostal/ulauncher'
+    #   - name: Instalação do ULauncher
+    #     become: true
+    #     apt:
+    #       name: ulauncher
