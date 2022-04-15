@@ -121,10 +121,13 @@
         - krita
 
     - name: Criação dos diretórios necessários
+      become: true
       file:
         path: '{{ item }}'
         state: directory
-        mode: 0775
+        mode: 0777
+        group: richard
+        seuser: richard
       loop:
         - '/opt/programas' 
         - '/dtp'
