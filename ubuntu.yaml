@@ -3,8 +3,6 @@
   hosts: localhost
   connection: local
   vars:
-    maven_home_dir: /opt/programas/apache-maven-3.8.5
-    http_proxy: http://proxy.example.com:8080  
     maven_settings: |
       <?xml version="1.0" encoding="utf-8"?>
       <settings>
@@ -24,7 +22,7 @@
             <id>google</id>
             <mirrorOf>google</mirrorOf>
             <url>http://google-maven-repository.googlecode.com/svn/repository</url>
-          </mirror>  
+          </mirror>
         </mirrors>
       </settings>
     maven_toolchains: |
@@ -59,7 +57,7 @@
           <configuration>
             <jdkHome>/usr/lib/jvm/jdk-17</jdkHome>
           </configuration>
-        </toolchain>  
+        </toolchain>
       </toolchains>
   tasks:
 
@@ -176,16 +174,6 @@
         loop:
           - { regexp: '^export MAVEN_HOME', line: 'export MAVEN_HOME="/opt/programas/apache-maven-3.8.5"' }
           - { regexp: '^export PATH', line: 'export PATH="$PATH:$MAVEN_HOME/bin"' }
-
-      # opção para copiar diretamente do github (deixar o repositório publico)
-      # - name: 'Criação do arquivo settings.xml'
-      #   copy:
-      #     src: '{{ item.src }}'
-      #     dest: '{{ item.dest }}'
-      #     remote_src: yes
-      #   loop:
-      #     - { src: https://raw.githubusercontent.com/richardmadureira/workstation-ubuntu/main/resources/settings.xml, dest: /home/richard/.m2/settings.xml}
-      #     - { src: https://raw.githubusercontent.com/richardmadureira/workstation-ubuntu/main/resources/settings.xml, dest: /home/richard/.m2/toolchains.xml}
 
       - name: Instalação do Keystore Explorer
         apt:
@@ -327,17 +315,6 @@
           - vscjava.vscode-java-pack
           - rocketseat.theme-omni
 
-    # com problemas... :(
-    # - block:
-    #   - name: Instalação do repositório Ulauncher
-    #     become: true
-    #     apt_repository:
-    #       repo: 'ppa:agornostal/ulauncher'
-    #   - name: Instalação do ULauncher
-    #     become: true
-    #     apt:
-    #       name: ulauncher
-
     - block:
       - name: Verificação se  Oh-My-zsh está instalado
         command: test -d /home/{{ ansible_user_id }}/.oh-my-zsh
@@ -374,30 +351,12 @@
         snap:
           name: spotify
           classic: yes
-      # - name: Instalação da chave do spotify
-      #   become: true
-      #   apt_key:
-      #     url: 'https://download.spotify.com/debian/pubkey_5E3C45D7B312C643.gpg'
-      #     state: present
-      # - name: Instalação do repositório do spotify
-      #   become: true
-      #   apt_repository:
-      #     repo: 'deb http://repository.spotify.com stable non-free'
-      #     state: present
-      #     filename: spotify
-      # - name: Instalação do Spotify
-      #   become: true
-      #   apt:
-      #     name: spotify-client
-      #     state: latest
-      #     update_cache: yes
-      #     install_recommends: yes
           
     - block:
       - name: Personalização do sistema operacional
         dconf:
-          key: {{ item.key }}
-          value: {{ item.value }}
+          key: '{{item.key}}'
+          value: '{{item.value}}'
           state: present
         loop:
           - { key: '/org/gnome/desktop/interface/gtk-theme', value: "'Yaru-olive-dark'"}
