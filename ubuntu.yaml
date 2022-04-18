@@ -393,3 +393,19 @@
       #     update_cache: yes
       #     install_recommends: yes
           
+    - block:
+      - name: Personalização do sistema operacional
+        dconf:
+          key: {{ item.key }}
+          value: {{ item.value }}
+          state: present
+        loop:
+          - { key: '/org/gnome/desktop/interface/gtk-theme', value: "'Yaru-olive-dark'"}
+          - { key: '/org/gnome/shell/extensions/ding icon-size', value: "'small'"}
+          - { key: '/org/gnome/shell/extensions/dash-to-dock/dash-max-icon-size', value: '32'}
+          - { key: '/org/gnome/shell/extensions/dash-to-dock/dock-position', value: "'BOTTOM'"}
+          - { key: '/org/gnome/shell/extensions/dash-to-dock/extend-height', value: 'false'}
+          - { key: '/org/gnome/shell/extensions/dash-to-dockd/dock-fixed', value: 'false'}
+          - { key: '/org/gnome/shell/extensions/dash-to-dock/multi-monitor', value: 'true'}
+          #- { key: '/org/gnome/shell/favorite-apps', value: "['ubuntu-desktop-installer_ubuntu-desktop-installer.desktop', 'ubiquity.desktop', 'firefox_firefox.desktop', 'thunderbird.desktop', 'org.gnome.Nautilus.desktop', 'rhythmbox.desktop', 'libreoffice-writer.desktop', 'snap-store_ubuntu-software.desktop', 'yelp.desktop']"}
+          - { key: '/org/gnome/shell/favorite-apps', value: "['org.gnome.Nautilus.desktop', 'org.gnome.Terminal.desktop', 'google-chrome.desktop', 'firefox.desktop', 'microsoft-edge-dev.desktop', 'microsoft-edge.desktop', 'firefox-developer-edition.desktop', 'code.desktop', 'eclipse.desktop', 'postman.desktop', 'dbeaver-ce_dbeaver-ce.desktop', 'spotify.desktop']"}

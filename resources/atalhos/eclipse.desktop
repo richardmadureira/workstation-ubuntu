@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=Eclipse
+Comment=IDE de desenvolvimento Java EE
+GenericName=Development IDE
+Exec=/opt/programas/eclipse/eclipse
+Icon=/opt/programas/eclipse/icon.xpm
+Type=Application
+StartupNotify=false
+StartupWMClass=eclipse
+Categories=Utility;TextEditor;Development;IDE;
+Keywords=eclipse;
