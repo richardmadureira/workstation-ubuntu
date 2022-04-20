@@ -262,7 +262,7 @@
         lineinfile:
           path: /home/{{ ansible_user_id }}/.zshrc
           regexp: '^plugins='
-          line: 'plugins=(git docker docker-compose mvn nvm npm yarn flutter)'
+          line: 'plugins=(git docker docker-compose mvn nvm npm yarn zsh-autosuggestions)'
 
     - block:
       - name: Instalação da chave PGP da Microsoft
@@ -345,6 +345,11 @@
           path: /home/{{ ansible_user_id }}/.zshrc
           line: 'autoload -U compinit && compinit'
           state: present
+      - name: Configuração de AutoSuggestions
+        git:
+          repo: 'https://github.com/zsh-users/zsh-autosuggestions'
+          dest: '/home/richard/.oh-my-zsh/custom/plugins/zsh-autosuggestions'
+
 
     - block:
       - name: Instalação do Spotify
