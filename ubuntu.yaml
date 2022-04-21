@@ -2,63 +2,6 @@
 - name: Preparação da Estação de Trabalho
   hosts: localhost
   connection: local
-  vars:
-    maven_settings: |
-      <?xml version="1.0" encoding="utf-8"?>
-      <settings>
-        <mirrors>
-          <mirror>
-            <id>mirror-dataprev</id>
-            <name>Maven Public Dtaprev</name>
-            <url>http://www-bin.prevnet/repository/public/</url>
-            <mirrorOf>*</mirrorOf>
-          </mirror>
-          <mirror>
-            <id>nexus</id>
-            <mirrorOf>nexus</mirrorOf>
-            <url>http://internal/nexus/content/repositories/thirdparty</url>
-          </mirror>
-          <mirror>
-            <id>google</id>
-            <mirrorOf>google</mirrorOf>
-            <url>http://google-maven-repository.googlecode.com/svn/repository</url>
-          </mirror>
-        </mirrors>
-      </settings>
-    maven_toolchains: |
-      <?xml version="1.0" encoding="UTF8"?>
-      <toolchains>
-        <toolchain>
-          <type>jdk</type>
-          <provides>
-            <version>1.8</version>
-            <vendor>openjdk</vendor>
-          </provides>
-          <configuration>
-            <jdkHome>/opt/programas/jdk1.8.0_131/</jdkHome>
-          </configuration>
-        </toolchain>
-        <toolchain>
-          <type>jdk</type>
-          <provides>
-            <version>11</version>
-            <vendor>openjdk</vendor>
-          </provides>
-          <configuration>
-            <jdkHome>/usr/lib/jvm/java-11-openjdk-amd64/</jdkHome>
-          </configuration>
-        </toolchain>
-        <toolchain>
-          <type>jdk</type>
-          <provides>
-            <version>17</version>
-            <vendor>oracle</vendor>
-          </provides>
-          <configuration>
-            <jdkHome>/usr/lib/jvm/jdk-17</jdkHome>
-          </configuration>
-        </toolchain>
-      </toolchains>
   tasks:
 
     - name: Atualizando Sistema Operacional
@@ -118,18 +61,76 @@
         - zsh
         - krita
 
+    - block:
+      - name: Criação do arquivo .zshrc
+        template:
+          src: './resources/zsh/zshrc.template'
+          dest: '/home/{{ ansible_user_id }}/.zshrc'
+          mode: 0755
+
+      - name: Verificação se Oh-My-zsh está instalado
+        command: test -d /home/{{ ansible_user_id }}/.oh-my-zsh
+        register: ohmyzsh
+        ignore_errors: true
+
+      - name: Instalação do Oh-My-zsh
+        shell:
+          cmd: 'curl -fsL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh | bash'
+          warn: false
+        when: ohmyzsh.rc != 0
+
+      - name: Alteração do shell default para ZSH
+        become: yes
+        user:
+          name: '{{ ansible_user_id }}'
+          shell: /bin/zsh
+
+      - name: Alteração do tema padrão do zsh para Agnoster
+        lineinfile:
+          path: /home/{{ ansible_user_id }}/.zshrc
+          regexp: '^ZSH_THEME='
+          line: 'ZSH_THEME="agnoster"'
+
+      - name: Criação do diretório ZSH Completion
+        file:
+          path: /home/{{ ansible_user_id }}/.oh-my-zsh/completions
+          state: directory
+          mode: 0755
+
+      - name: Adicionando autoload ao compinit
+        lineinfile:
+          path: /home/{{ ansible_user_id }}/.zshrc
+          line: 'autoload -U compinit && compinit'
+          state: present
+
+      - name: Configuração de AutoSuggestions
+        git:
+          repo: 'https://github.com/zsh-users/zsh-autosuggestions'
+          dest: '/home/{{ ansible_user_id }}/.oh-my-zsh/custom/plugins/zsh-autosuggestions'
+      - name: Configuração de variavel ambiente para o OH-MY-ZSH
+        lineinfile:
+          path: /home/{{ ansible_user_id }}/.zshrc
+          line: 'export ZSH=/home/richard/.oh-my-zsh'
+          insertafter: '# Set up the prompt'
+      - name: Inclusão da importação do oh-my-zsh
+        lineinfile:
+          path: /home/{{ ansible_user_id }}/.zshrc
+          line: 'source $ZSH/oh-my-zsh.sh'
+          insertafter: EOF
+
     - name: Criação dos diretórios necessários
       become: true
       file:
         path: '{{ item }}'
         state: directory
         mode: 0777
-        group: richard
-        seuser: richard
+        group: '{{ ansible_user_id }}'
+        seuser: '{{ ansible_user_id }}'
       loop:
-        - '/opt/programas' 
+        - '/opt/programas'
         - '/dtp'
-        - '/home/richard/.m2'
+        - '/home/{{ ansible_user_id }}/.m2'
+        - '/home/{{ ansible_user_id }}/.local/share/fonts'
 
     - block:
       - name: Instalação do Eclipse Java EE
@@ -138,6 +139,7 @@
           dest: /opt/programas
           remote_src: yes
           creates: /opt/programas/eclipse
+
       - name: Alteração das configurações de memória do Eclipse (eclipse.ini)
         lineinfile:
           dest: /opt/programas/eclipse/eclipse.ini
@@ -156,77 +158,85 @@
           remote_src: yes
           creates: '/opt/programas/apache-maven-3.8.5'
 
-      - name: Criação do arquivo settings.xml
-        copy:
-          content: '{{ item.content }}'
-          dest: '{{ item.dest }}'
+      - name: Criação do arquivo settings.xml e toolchains.xml
+        template:
+          src: './resources/apache-maven/settings.xml'
+          dest: '/home/{{ ansible_user_id }}/.m2/settings.xml'
+
+      - name: Criacao do arquivo toolchains.xml
+        template:
+          src: './resources/apache-maven/toolchains.xml'
+          dest: '/home/{{ ansible_user_id }}/.m2/toolchains.xml'
         loop:
-          - { content: '{{ maven_settings }}', dest: '/home/richard/.m2/settings.xml'}
-          - { content: '{{ maven_toolchains }}', dest: '/home/richard/.m2/toolchains.xml'}
+          - { content: './resources/apache-maven/settings.xml', dest: '/home/{{ ansible_user_id }}/.m2/settings.xml'}
+          - { content: './resources/apache-maven/toolchains.xml', dest: '/home/{{ ansible_user_id }}/.m2/toolchains.xml'}
 
       - name: Configuração de variáveis ambientes
         lineinfile:
-          dest: /home/richard/.zshrc
+          dest: /home/{{ ansible_user_id }}/.zshrc
           line: '{{ item.line }}'
           regexp: '{{ item.regexp }}'
-          insertafter: 'EOF'
           state: present
         loop:
           - { regexp: '^export MAVEN_HOME', line: 'export MAVEN_HOME="/opt/programas/apache-maven-3.8.5"' }
           - { regexp: '^export PATH', line: 'export PATH="$PATH:$MAVEN_HOME/bin"' }
 
-      - name: Instalação do Keystore Explorer
-        apt:
-          deb: 'https://github.com/kaikramer/keystore-explorer/releases/download/v5.5.1/kse_5.5.1_all.deb'
+    - name: Instalação do Keystore Explorer
+      apt:
+        deb: 'https://github.com/kaikramer/keystore-explorer/releases/download/v5.5.1/kse_5.5.1_all.deb'
 
-      - name: Configuração do git (.gitconfig)
-        git_config:
-          scope: global
-          name: '{{ item.name }}'
-          value: '{{ item.value }}'
-        loop:
-          - { name: 'user.name', value: 'Richard Mendes Madureira' }
-          - { name: 'user.email', value: 'richard.madureira@dataprev.gov.br' }
-          - { name: 'http.sslVerify', value: 'false' }
-          - { name: 'credential.helper', value:  'cache --timeout=36000' }
-          - { name: 'core.editor', value:  'code --wait --new-window' }
-          - { name: 'diff.tool', value: 'vscode' }
-          - { name: 'difftool.vscode.cmd', value: 'code --wait --diff $LOCAL $REMOTE' }
-          - { name: 'difftool.prompt', value: 'false' }
-          - { name: 'merge.tool', value: 'vscode' }
-          - { name: 'mergetool.vscode.cmd', value: 'code --wait $MERGED' }
-      
+    - name: Configuração do git (.gitconfig)
+      git_config:
+        scope: global
+        name: '{{ item.name }}'
+        value: '{{ item.value }}'
+      loop:
+        - { name: 'user.name', value: 'Richard Mendes Madureira' }
+        - { name: 'user.email', value: 'richard.madureira@dataprev.gov.br' }
+        - { name: 'http.sslVerify', value: 'false' }
+        - { name: 'credential.helper', value:  'cache --timeout=36000' }
+        - { name: 'core.editor', value:  'code --wait --new-window' }
+        - { name: 'diff.tool', value: 'vscode' }
+        - { name: 'difftool.vscode.cmd', value: 'code --wait --diff $LOCAL $REMOTE' }
+        - { name: 'difftool.prompt', value: 'false' }
+        - { name: 'merge.tool', value: 'vscode' }
+        - { name: 'mergetool.vscode.cmd', value: 'code --wait $MERGED' }
+
     - block:
       - name: Instalação da chave PGP do Google Chrome
         become: true
         apt_key:
           url: 'https://dl.google.com/linux/linux_signing_key.pub'
           state: present
+
       - name: Instalação do repositório do Google Chrome
         become: true
         apt_repository:
           repo: 'deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main'
           state: present
           filename: google-chrome
+
       - name: Instalação do Google Chrome Stable
         become: true
         apt:
           name: google-chrome-stable
           state: latest
           update_cache: yes
-    
+
     - block:
       - name: Instalação da chave PGP do Docker
         become: true
         apt_key:
           url: 'https://download.docker.com/linux/ubuntu/gpg'
           state: present
+
       - name: Instalação do repositório do docker
         become: true
         apt_repository:
           repo: 'deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable'
           state: present
           filename: docker-ce
+
       - name: Instalação do Docker
         become: true
         apt:
@@ -236,29 +246,22 @@
           - docker-ce
           - docker-ce-cli
           - containerd.io
+
       - name: Inclusão de usuário existente no grupo docker
         become: yes
-        user: 
+        user:
           name: '{{ ansible_user_id }}'
           groups: docker
           append: yes
+
       - name: Instalação do Docker Compose
         become: true
         get_url:
           url: 'https://github.com/docker/compose/releases/download/1.29.2/docker-compose-Linux-x86_64'
           dest: '/usr/local/bin/docker-compose'
           mode: 755
-      - name: Instalação do Docker Machine Bash Completion
-        become: true
-        get_url:
-          url: 'https://raw.githubusercontent.com/docker/machine/v0.16.2/contrib/completion/bash/docker-machine.bash'
-          dest: '/etc/bash_completion.d/docker-machine'
-      - name: Instalação do Docker-Compose Bash Completion
-        become: true
-        get_url:
-          url: 'https://raw.githubusercontent.com/docker/compose/1.29.2/contrib/completion/bash/docker-compose'
-          dest: '/etc/bash_completion.d/docker-compose'
-      - name: Instalação do Docker-Compose e Docker Machine no Zsh Completion
+
+      - name: Configuração do autocomplete para o docker e o docker-compose
         lineinfile:
           path: /home/{{ ansible_user_id }}/.zshrc
           regexp: '^plugins='
@@ -270,24 +273,28 @@
         apt_key:
           url: 'https://packages.microsoft.com/keys/microsoft.asc'
           state: present
+
       - name: Instalação do repositório do Visual Studio Code
         become: true
         apt_repository:
           repo: 'deb [arch=amd64] https://packages.microsoft.com/repos/code stable main'
           state: present
           filename: vscode
+
       - name: Instalação do repositório do Microsoft Teams
         become: true
         apt_repository:
           repo: 'deb [arch=amd64] https://packages.microsoft.com/repos/ms-teams stable main'
           state: present
           filename: teams
+
       - name: Instalação do repositório do Microsoft Edge
         become: true
         apt_repository:
           repo: 'deb [arch=amd64] https://packages.microsoft.com/repos/edge stable main'
           state: present
           filename: microsoft-edge
+
       - name: Instalação do Visual Studio Code, Microsoft Teams e Microsoft Edge Stable
         become: true
         apt:
@@ -296,10 +303,11 @@
           - code
           - teams
           - microsoft-edge-stable
+
       - name: Instalação das extensões para o Visual Studio Code
         shell:
           cmd: code --install-extension '{{ item }}'
-        loop: 
+        loop:
           - dbaeumer.vscode-eslint
           - Dart-Code.flutter
           - Dart-Code.dart-code
@@ -315,48 +323,22 @@
           - vscjava.vscode-java-pack
           - rocketseat.theme-omni
 
-    - block:
-      - name: Verificação se  Oh-My-zsh está instalado
-        command: test -d /home/{{ ansible_user_id }}/.oh-my-zsh
-        register: ohmyzsh
-        ignore_errors: true
-      - name: Instalando Oh-My-zsh
-        shell:
-          cmd: 'curl -fsL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh | bash'
-          warn: false
-        when: ohmyzsh.rc != 0
-      - name: Alterando o Default shell para  ZSH
-        become: yes
-        user:
-          name: '{{ ansible_user_id }}'
-          shell: /bin/zsh
-      - name: Changing Default ZSH Theme to Agnoster
-        lineinfile:
-          path: /home/{{ ansible_user_id }}/.zshrc
-          regexp: '^ZSH_THEME='
-          line: 'ZSH_THEME="agnoster"'
-      - name: Criação do diretório ZSH Completion
-        file:
-          path: /home/{{ ansible_user_id }}/.oh-my-zsh/completions
-          state: directory
-          mode: 0755
-      - name: Adicionando autoload ao compinit
-        lineinfile:
-          path: /home/{{ ansible_user_id }}/.zshrc
-          line: 'autoload -U compinit && compinit'
-          state: present
-      - name: Configuração de AutoSuggestions
-        git:
-          repo: 'https://github.com/zsh-users/zsh-autosuggestions'
-          dest: '/home/richard/.oh-my-zsh/custom/plugins/zsh-autosuggestions'
+    - name: Instalação do Spotify
+      become: true
+      snap:
+        name: spotify
+        classic: yes
 
+    - name: Inclusão de fontes
+      copy:
+        src: '{{ item }}'
+        dest: '/home/{{ ansible_user_id }}/.local/share/fonts'
+      loop:
+        - './resources/fonts/MesloLGS NF Bold Italic.ttf'
+        - './resources/fonts/MesloLGS NF Bold.ttf'
+        - './resources/fonts/MesloLGS NF Italic.ttf'
+        - './resources/fonts/MesloLGS NF Regular.ttf'
 
-    - block:
-      - name: Instalação do Spotify
-        snap:
-          name: spotify
-          classic: yes
-          
     - block:
       - name: Personalização do sistema operacional
         dconf:
@@ -371,5 +353,4 @@
           - { key: '/org/gnome/shell/extensions/dash-to-dock/extend-height', value: 'false'}
           - { key: '/org/gnome/shell/extensions/dash-to-dockd/dock-fixed', value: 'false'}
           - { key: '/org/gnome/shell/extensions/dash-to-dock/multi-monitor', value: 'true'}
-          #- { key: '/org/gnome/shell/favorite-apps', value: "['ubuntu-desktop-installer_ubuntu-desktop-installer.desktop', 'ubiquity.desktop', 'firefox_firefox.desktop', 'thunderbird.desktop', 'org.gnome.Nautilus.desktop', 'rhythmbox.desktop', 'libreoffice-writer.desktop', 'snap-store_ubuntu-software.desktop', 'yelp.desktop']"}
-          - { key: '/org/gnome/shell/favorite-apps', value: "['org.gnome.Nautilus.desktop', 'org.gnome.Terminal.desktop', 'google-chrome.desktop', 'firefox.desktop', 'microsoft-edge-dev.desktop', 'microsoft-edge.desktop', 'firefox-developer-edition.desktop', 'code.desktop', 'eclipse.desktop', 'postman.desktop', 'dbeaver-ce_dbeaver-ce.desktop', 'spotify.desktop']"}
+          #- { key: '/org/gnome/shell/favorite-apps', value: "['org.gnome.Nautilus.desktop', 'org.gnome.Terminal.desktop', 'google-chrome.desktop', 'firefox.desktop', 'microsoft-edge-dev.desktop', 'microsoft-edge.desktop', 'firefox-developer-edition.desktop', 'code.desktop', 'eclipse.desktop', 'postman.desktop', 'dbeaver-ce_dbeaver-ce.desktop', 'spotify.desktop']"}
