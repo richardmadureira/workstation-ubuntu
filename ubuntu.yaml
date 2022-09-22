@@ -36,6 +36,7 @@
         - fonts-firacode
         - fonts-powerline
         - fonts-font-awesome
+        - fonts-jetbrains-mono
         - gnome-tweaks
         - vlc
         - gimp
@@ -153,10 +154,10 @@
     - block:
       - name: Instalação do Apache Maven
         unarchive:
-          src: 'https://dlcdn.apache.org/maven/maven-3/3.8.5/binaries/apache-maven-3.8.5-bin.tar.gz'
+          src: 'https://dlcdn.apache.org/maven/maven-3/3.8.6/binaries/apache-maven-3.8.6-bin.tar.gz'
           dest: '/opt/programas'
           remote_src: yes
-          creates: '/opt/programas/apache-maven-3.8.5'
+          creates: '/opt/programas/apache-maven-3.8.6'
 
       - name: Criação do arquivo settings.xml e toolchains.xml
         template:
@@ -178,10 +179,11 @@
           regexp: '{{ item.regexp }}'
           state: present
         loop:
-          - { regexp: '^export MAVEN_HOME', line: 'export MAVEN_HOME="/opt/programas/apache-maven-3.8.5"' }
+          - { regexp: '^export MAVEN_HOME', line: 'export MAVEN_HOME="/opt/programas/apache-maven-3.8.6"' }
           - { regexp: '^export PATH', line: 'export PATH="$PATH:$MAVEN_HOME/bin"' }
 
     - name: Instalação do Keystore Explorer
+      become: true
       apt:
         deb: 'https://github.com/kaikramer/keystore-explorer/releases/download/v5.5.1/kse_5.5.1_all.deb'
 
@@ -298,7 +300,7 @@
       - name: Instalação do Visual Studio Code, Microsoft Teams e Microsoft Edge Stable
         become: true
         apt:
-          name: code
+          name: '{{ item }}'
         loop:
           - code
           - teams
@@ -315,7 +317,7 @@
           - donjayamanne.githistory
           - eamodio.gitlens
           - GitHub.copilot
-          - GabrielBB.vscode-lombok
+          - vscjava.vscode-lombok
           - PKief.material-icon-theme
           - ms-edgedevtools.vscode-edge-devtools
           - vscjava.vscode-spring-boot-dashboard
