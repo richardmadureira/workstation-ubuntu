@@ -248,6 +248,7 @@
           - docker-ce
           - docker-ce-cli
           - containerd.io
+          - docker-compose-plugin
 
       - name: Inclusão de usuário existente no grupo docker
         become: yes
@@ -256,18 +257,11 @@
           groups: docker
           append: yes
 
-      - name: Instalação do Docker Compose
-        become: true
-        get_url:
-          url: 'https://github.com/docker/compose/releases/download/1.29.2/docker-compose-Linux-x86_64'
-          dest: '/usr/local/bin/docker-compose'
-          mode: 755
-
-      - name: Configuração do autocomplete para o docker e o docker-compose
+      - name: Configuração do autocomplete para o docker
         lineinfile:
           path: /home/{{ ansible_user_id }}/.zshrc
           regexp: '^plugins='
-          line: 'plugins=(git docker docker-compose mvn nvm npm yarn zsh-autosuggestions)'
+          line: 'plugins=(git docker mvn nvm npm yarn zsh-autosuggestions)'
 
     - block:
       - name: Instalação da chave PGP da Microsoft
