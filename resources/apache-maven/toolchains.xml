@@ -7,7 +7,7 @@
       <vendor>openjdk</vendor>
     </provides>
     <configuration>
-      <jdkHome>/opt/programas/jdk1.8.0_131/</jdkHome>
+      <jdkHome>/usr/lib/jvm/java-8-openjdk-amd64</jdkHome>
     </configuration>
   </toolchain>
   <toolchain>
@@ -17,7 +17,7 @@
       <vendor>openjdk</vendor>
     </provides>
     <configuration>
-      <jdkHome>/usr/lib/jvm/java-11-openjdk-amd64/</jdkHome>
+      <jdkHome>/usr/lib/jvm/java-11-openjdk-amd64</jdkHome>
     </configuration>
   </toolchain>
   <toolchain>
@@ -43,11 +43,11 @@
   <toolchain>
     <type>jdk</type>
     <provides>
-      <version>17</version>
-      <vendor>oracle</vendor>
+      <version>19</version>
+      <vendor>openjdk</vendor>
     </provides>
     <configuration>
-      <jdkHome>/usr/lib/jvm/jdk-17</jdkHome>
+      <jdkHome>/usr/lib/jvm/java-19-openjdk-amd64/</jdkHome>
     </configuration>
-  </toolchain>  
+  </toolchain>
 </toolchains>

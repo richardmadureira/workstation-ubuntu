@@ -1,0 +1,39 @@
+{
+    "workbench.iconTheme": "vscode-icons",
+    "workbench.colorTheme": "Omni",
+    "editor.bracketPairColorization.enabled": true,
+    "editor.fontFamily": "JetBrains Mono",
+    "editor.fontLigatures": true,
+    "editor.fontSize": 24,
+    "terminal.integrated.fontFamily": "MesloLGS NF",
+    "files.exclude": {
+        "**/.classpath": true,
+        "**/.project": true,
+        "**/.settings": true,
+        "**/.factorypath": true,
+        "**/node_modules": true,
+        "**/.apt_generated": true,
+        "**/.apt_generated_tests": true
+    },
+    "files.encoding": "utf8",
+    "explorer.confirmDelete": false,
+    "java.configuration.runtimes": [
+        {
+            "name": "JavaSE-1.8",
+            "path": "/usr/lib/jvm/jdk1.8.0_202"
+        },
+        {
+            "name": "JavaSE-11",
+            "path": "/usr/lib/jvm/java-11-openjdk-amd64"
+        },
+        {
+            "name": "JavaSE-17",
+            "path": "/usr/lib/jvm/java-17-oracle"
+        },
+        {
+            "name": "JavaSE-18",
+            "path": "/opt/programas/jdk-18.0.1.1"
+        }
+    ],
+    "files.maxMemoryForLargeFilesMB": 10240
+}

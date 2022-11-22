@@ -27,7 +27,11 @@
         - gnupg
         - lsb-release
         - git
+        - openjdk-8-jdk
         - openjdk-11-jdk
+        - openjdk-17-jdk
+        - openjdk-18-jdk
+        - openjdk-19-jdk
         - ubuntu-restricted-extras
         - ubuntu-restricted-addons
         - geany
@@ -308,17 +312,16 @@
           - dbaeumer.vscode-eslint
           - Dart-Code.flutter
           - Dart-Code.dart-code
-          - ms-azuretools.vscode-docker
           - donjayamanne.githistory
           - eamodio.gitlens
           - GitHub.copilot
-          - vscjava.vscode-lombok
           - PKief.material-icon-theme
           - ms-edgedevtools.vscode-edge-devtools
           - vscjava.vscode-spring-boot-dashboard
           - rangav.vscode-thunder-client
           - vscjava.vscode-java-pack
           - rocketseat.theme-omni
+          - redhat.java
 
     - name: Instalação do Spotify
       become: true
