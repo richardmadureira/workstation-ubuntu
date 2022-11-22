@@ -157,6 +157,13 @@
           - { regexp: '^-Xmx', line: '-Xmx4096m' }
 
     - block:
+      - name: Instalação do Firefox Developer Edition
+        unarchive:
+          src: 'https://download-installer.cdn.mozilla.net/pub/devedition/releases/108.0b4/linux-x86_64/pt-BR/firefox-108.0b4.tar.bz2'
+          dest: '/opt/programas'
+          remote_src: yes
+          creates: '/opt/programas/firefox'
+
       - name: Instalação do Apache Maven
         unarchive:
           src: 'https://dlcdn.apache.org/maven/maven-3/3.8.6/binaries/apache-maven-3.8.6-bin.tar.gz'
