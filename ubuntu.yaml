@@ -25,7 +25,6 @@
         - ca-certificates
         - curl
         - gnupg
-        - gnutls-bin
         - lsb-release
         - git
         - openjdk-8-jdk
@@ -362,11 +361,50 @@
           - { key: '/org/gnome/shell/extensions/dash-to-dockd/dock-fixed', value: 'false'}
           - { key: '/org/gnome/shell/extensions/dash-to-dock/multi-monitor', value: 'true'}
           #- { key: '/org/gnome/shell/favorite-apps', value: "['org.gnome.Nautilus.desktop', 'org.gnome.Terminal.desktop', 'google-chrome.desktop', 'firefox.desktop', 'microsoft-edge-dev.desktop', 'microsoft-edge.desktop', 'firefox-developer-edition.desktop', 'code.desktop', 'eclipse.desktop', 'postman.desktop', 'dbeaver-ce_dbeaver-ce.desktop', 'spotify.desktop']"}
+
     - block:
-      - name: Instalação e configuração do token A3 para acessar VPN da Dataprev
+      - name: Adicionando repositório para instalação da libssl
+        apt_repository:
+          repo: deb http://security.ubuntu.com/ubuntu impish-security main
+          state: present
+          filename: impish-security
+
+      - name: Atualização da lista de pacotes para utilização do token A3
+        become: true
+        apt:
+          update_cache: yes
+          upgrade: dist
+          force_apt_get: yes
+          install_recommends: yes
+
+      - name: Instalação de bibliotecas para utilização do token A3
+        become: true
+        apt:
+          name: '{{ item }}'
+          install_recommends: yes
+          state: present
+        loop:
+          - libssl-1.1
+          - pcscd
+          - libccid
+          - libpcsclite1
+          - pcsc-tools
+          - libnss3-tools
+          - gnutls-bin
+          - libssl-dev
+          - opensc
+
+      - name: Reinicio do serviço pcscd
+        become: true
+        service:
+          name: pcscd.service
+          state: restarted
+
+      - name: Criação do diretório de arquivos para conexão vpn
         file:
           path: '/home/{{ ansible_user_id }}/Documentos/vpn-dataprev'
           state: directory
+      - name: Copia dos certificados e scripts sh para vpn
         copy:
           src: '{{ item }}'
           dest: '/home/{{ ansible_user_id }}/Documentos/vpn-dataprev'
