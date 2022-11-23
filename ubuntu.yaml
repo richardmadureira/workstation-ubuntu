@@ -25,6 +25,7 @@
         - ca-certificates
         - curl
         - gnupg
+        - gnutls-bin
         - lsb-release
         - git
         - openjdk-8-jdk
