@@ -141,7 +141,7 @@
     - block:
       - name: Instalação do Eclipse Java EE
         unarchive:
-          src: 'https://eclipse.c3sl.ufpr.br/technology/epp/downloads/release/2022-09/R/eclipse-jee-2022-09-R-linux-gtk-x86_64.tar.gz'
+          src: 'https://eclipse.c3sl.ufpr.br/technology/epp/downloads/release/2022-12/R/eclipse-jee-2022-12-R-linux-gtk-x86_64.tar.gz'
           dest: /opt/programas
           remote_src: yes
           creates: /opt/programas/eclipse
@@ -166,10 +166,10 @@
 
       - name: Instalação do Apache Maven
         unarchive:
-          src: 'https://dlcdn.apache.org/maven/maven-3/3.8.6/binaries/apache-maven-3.8.6-bin.tar.gz'
+          src: 'https://dlcdn.apache.org/maven/maven-3/3.9.0/binaries/apache-maven-3.9.0-bin.tar.gz'
           dest: '/opt/programas'
           remote_src: yes
-          creates: '/opt/programas/apache-maven-3.8.6'
+          creates: '/opt/programas/apache-maven-3.9.0'
 
       - name: Criação do arquivo settings.xml e toolchains.xml
         template:
@@ -191,7 +191,7 @@
           regexp: '{{ item.regexp }}'
           state: present
         loop:
-          - { regexp: '^export MAVEN_HOME', line: 'export MAVEN_HOME="/opt/programas/apache-maven-3.8.6"' }
+          - { regexp: '^export MAVEN_HOME', line: 'export MAVEN_HOME="/opt/programas/apache-maven-3.9.0"' }
           - { regexp: '^export PATH', line: 'export PATH="$PATH:$MAVEN_HOME/bin"' }
 
     - name: Instalação do Keystore Explorer
@@ -345,6 +345,25 @@
         - './resources/fonts/MesloLGS NF Bold.ttf'
         - './resources/fonts/MesloLGS NF Italic.ttf'
         - './resources/fonts/MesloLGS NF Regular.ttf'
+
+    - name: "nvm"
+      shell: >
+        curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash
+      args:
+        executable: /bin/bash
+        chdir: "{{ ansible_env.HOME }}"
+        creates: "{{ ansible_env.HOME }}/.nvm/nvm.sh"
+
+    - name: "node"
+      shell: >
+        . {{ ansible_env.HOME }}/.nvm/nvm.sh && nvm install {{ item }}
+      args:
+        executable: /bin/bash
+        chdir: "{{ ansible_env.HOME }}"
+        creates: "{{ ansible_env.HOME }}/.nvm/versions/{{ item }}"
+      loop:
+        - v14.21.3
+        - node
 
     - block:
       - name: Personalização do sistema operacional
