@@ -192,6 +192,7 @@
           - docker-ce
           - docker-ce-cli
           - containerd.io
+          - docker-buildx-plugin
           - docker-compose-plugin
 
       - name: Inclusão de usuário existente no grupo docker
