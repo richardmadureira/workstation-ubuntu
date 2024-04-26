@@ -27,11 +27,6 @@
         - gnupg
         - lsb-release
         - git
-        - openjdk-8-jdk
-        - openjdk-11-jdk
-        - openjdk-17-jdk
-        - openjdk-18-jdk
-        - openjdk-19-jdk
         - ubuntu-restricted-extras
         - ubuntu-restricted-addons
         - geany
@@ -39,7 +34,6 @@
         - wget
         - fonts-firacode
         - fonts-powerline
-        - fonts-font-awesome
         - fonts-jetbrains-mono
         - gnome-tweaks
         - vlc
@@ -55,17 +49,7 @@
         - terminator
         - tilix
         - openconnect
-        - network-manager-openconnect
-        - network-manager-openconnect-gnome
-        - libglu1-mesa
-        - clang
-        - cmake
-        - ninja-build
-        - pkg-config
-        - libgtk-3-dev
-        - liblzma-dev
         - zsh
-        - krita
 
     - block:
       - name: Criação do arquivo .zshrc
@@ -91,28 +75,11 @@
           name: '{{ ansible_user_id }}'
           shell: /bin/zsh
 
-      - name: Alteração do tema padrão do zsh para Agnoster
-        lineinfile:
-          path: /home/{{ ansible_user_id }}/.zshrc
-          regexp: '^ZSH_THEME='
-          line: 'ZSH_THEME="agnoster"'
-
-      - name: Criação do diretório ZSH Completion
-        file:
-          path: /home/{{ ansible_user_id }}/.oh-my-zsh/completions
-          state: directory
-          mode: 0755
-
-      - name: Adicionando autoload ao compinit
-        lineinfile:
-          path: /home/{{ ansible_user_id }}/.zshrc
-          line: 'autoload -U compinit && compinit'
-          state: present
-
       - name: Configuração de AutoSuggestions
         git:
           repo: 'https://github.com/zsh-users/zsh-autosuggestions'
           dest: '/home/{{ ansible_user_id }}/.oh-my-zsh/custom/plugins/zsh-autosuggestions'
+
       - name: Configuração de variavel ambiente para o OH-MY-ZSH
         lineinfile:
           path: /home/{{ ansible_user_id }}/.zshrc
@@ -139,37 +106,12 @@
         - '/home/{{ ansible_user_id }}/.local/share/fonts'
 
     - block:
-      - name: Instalação do Eclipse Java EE
-        unarchive:
-          src: 'https://eclipse.c3sl.ufpr.br/technology/epp/downloads/release/2022-12/R/eclipse-jee-2022-12-R-linux-gtk-x86_64.tar.gz'
-          dest: /opt/programas
-          remote_src: yes
-          creates: /opt/programas/eclipse
-
-      - name: Alteração das configurações de memória do Eclipse (eclipse.ini)
-        lineinfile:
-          dest: /opt/programas/eclipse/eclipse.ini
-          regexp: '{{ item.regexp }}'
-          line: '{{ item.line }}'
-          state: present
-        loop:
-          - { regexp: '^-Xms', line: '-Xms512m' }
-          - { regexp: '^-Xmx', line: '-Xmx4096m' }
-
-    - block:
       - name: Instalação do Firefox Developer Edition
         unarchive:
-          src: 'https://download-installer.cdn.mozilla.net/pub/devedition/releases/108.0b4/linux-x86_64/pt-BR/firefox-108.0b4.tar.bz2'
+          src: 'https://download-installer.cdn.mozilla.net/pub/devedition/releases/126.0b5/linux-x86_64/en-US/firefox-126.0b5.tar.bz2'
           dest: '/opt/programas'
           remote_src: yes
           creates: '/opt/programas/firefox'
-
-      - name: Instalação do Apache Maven
-        unarchive:
-          src: 'https://dlcdn.apache.org/maven/maven-3/3.9.0/binaries/apache-maven-3.9.0-bin.tar.gz'
-          dest: '/opt/programas'
-          remote_src: yes
-          creates: '/opt/programas/apache-maven-3.9.0'
 
       - name: Criação do arquivo settings.xml e toolchains.xml
         template:
@@ -183,16 +125,6 @@
         loop:
           - { content: './resources/apache-maven/settings.xml', dest: '/home/{{ ansible_user_id }}/.m2/settings.xml'}
           - { content: './resources/apache-maven/toolchains.xml', dest: '/home/{{ ansible_user_id }}/.m2/toolchains.xml'}
-
-      - name: Configuração de variáveis ambientes
-        lineinfile:
-          dest: /home/{{ ansible_user_id }}/.zshrc
-          line: '{{ item.line }}'
-          regexp: '{{ item.regexp }}'
-          state: present
-        loop:
-          - { regexp: '^export MAVEN_HOME', line: 'export MAVEN_HOME="/opt/programas/apache-maven-3.9.0"' }
-          - { regexp: '^export PATH', line: 'export PATH="$PATH:$MAVEN_HOME/bin"' }
 
     - name: Instalação do Keystore Explorer
       become: true
@@ -269,12 +201,6 @@
           groups: docker
           append: yes
 
-      - name: Configuração do autocomplete para o docker
-        lineinfile:
-          path: /home/{{ ansible_user_id }}/.zshrc
-          regexp: '^plugins='
-          line: 'plugins=(git docker mvn nvm npm yarn zsh-autosuggestions)'
-
     - block:
       - name: Instalação da chave PGP da Microsoft
         become: true
@@ -289,13 +215,6 @@
           state: present
           filename: vscode
 
-      - name: Instalação do repositório do Microsoft Teams
-        become: true
-        apt_repository:
-          repo: 'deb [arch=amd64] https://packages.microsoft.com/repos/ms-teams stable main'
-          state: present
-          filename: teams
-
       - name: Instalação do repositório do Microsoft Edge
         become: true
         apt_repository:
@@ -309,8 +228,11 @@
           name: '{{ item }}'
         loop:
           - code
-          - teams
           - microsoft-edge-stable
+
+      - name: Verificar se as extensões do Visual Studio Code estão instaladas
+        shell: code --list-extensions
+        register: vscode_extensions
 
       - name: Instalação das extensões para o Visual Studio Code
         shell:
@@ -329,12 +251,22 @@
           - vscjava.vscode-java-pack
           - rocketseat.theme-omni
           - redhat.java
+        when: item not in vscode_extensions.stdout_lines
 
     - name: Instalação do Spotify
       become: true
       snap:
         name: spotify
         classic: yes
+
+    - name: Inclusão de fontes para o PowerLevel10K
+      get_url: url={{ item }} dest=/home/{{ ansible_user_id }}/.local/share/fonts
+      loop:
+        - https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Regular.ttf
+        - https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Bold.ttf
+        - https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Italic.ttf
+        - https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Bold%20Italic.ttf
+      
 
     - name: Inclusão de fontes
       copy:
@@ -348,7 +280,7 @@
 
     - name: "nvm"
       shell: >
-        curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash
+        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
       args:
         executable: /bin/bash
         chdir: "{{ ansible_env.HOME }}"
@@ -362,21 +294,7 @@
         chdir: "{{ ansible_env.HOME }}"
         creates: "{{ ansible_env.HOME }}/.nvm/versions/{{ item }}"
       loop:
-        - v14.21.3
-        - node
-
-    - block:
-      - name: Personalização do sistema operacional
-        dconf:
-          key: '{{item.key}}'
-          value: '{{item.value}}'
-          state: present
-        loop:
-          - { key: '/org/gnome/desktop/interface/gtk-theme', value: "'Yaru-olive-dark'"}
-          - { key: '/org/gnome/shell/extensions/ding icon-size', value: "'small'"}
-          - { key: '/org/gnome/shell/extensions/dash-to-dock/dash-max-icon-size', value: '32'}
-          - { key: '/org/gnome/shell/extensions/dash-to-dock/dock-position', value: "'BOTTOM'"}
-          - { key: '/org/gnome/shell/extensions/dash-to-dock/extend-height', value: 'false'}
-          - { key: '/org/gnome/shell/extensions/dash-to-dockd/dock-fixed', value: 'false'}
-          - { key: '/org/gnome/shell/extensions/dash-to-dock/multi-monitor', value: 'true'}
-          #- { key: '/org/gnome/shell/favorite-apps', value: "['org.gnome.Nautilus.desktop', 'org.gnome.Terminal.desktop', 'google-chrome.desktop', 'firefox.desktop', 'microsoft-edge-dev.desktop', 'microsoft-edge.desktop', 'firefox-developer-edition.desktop', 'code.desktop', 'eclipse.desktop', 'postman.desktop', 'dbeaver-ce_dbeaver-ce.desktop', 'spotify.desktop']"}
+        - v8.17.0
+        - v10.24.21
+        - v12.22.12
+        - v20.12.2
