@@ -1,0 +1,38 @@
+---
+- name: Listar versões Maven instaladas no diretório do SDKMAN
+  ansible.builtin.find:
+    paths: "/home/richard/.sdkman/candidates/maven"
+    file_type: directory
+    recurse: no
+  register: maven_dirs
+  become: true
+  become_user: richard
+
+- name: Definir lista de versões Maven instaladas
+  ansible.builtin.set_fact:
+    installed_maven_list: "{{ maven_dirs.files | map(attribute='path') | map('basename') | list }}"
+
+- name: Instalar versões Maven faltantes
+  ansible.builtin.shell: |
+    source "/home/richard/.sdkman/bin/sdkman-init.sh"
+    export sdkman_auto_answer=true
+    sdk install maven {{ item }}
+  args:
+    executable: /bin/bash
+  become: true
+  become_user: richard
+  loop: "{{ sdkman_maven_versions }}"
+  when: item not in installed_maven_list
+
+- name: Configurar a versão do Maven padrão
+  ansible.builtin.shell: |
+    source "/home/richard/.sdkman/bin/sdkman-init.sh"
+    sdk default maven {{ maven_default_version }}
+  args:
+    executable: /bin/bash
+  become: true
+  become_user: richard
+  register: maven_default_output
+  # Só marca como 'changed' se o SDKMAN realmente precisar trocar o link simbólico
+  changed_when: "'Default maven set to' in maven_default_output.stdout"
+  when: maven_default_version is defined

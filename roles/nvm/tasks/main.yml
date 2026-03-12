@@ -1,0 +1,36 @@
+- name: Instalar NVM
+  become: true
+  become_user: "{{ user }}"
+  shell: |
+    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/{{nvm}}/install.sh | bash
+  args:
+    creates: "{{ home_dir }}/.nvm"
+
+- name: Instalar versões Node
+  become: true
+  become_user: "{{ user }}"
+  shell: |
+    export NVM_DIR="{{ home_dir }}/.nvm"
+    source "$NVM_DIR/nvm.sh"
+    nvm install {{ item }}
+  args:
+    executable: /bin/bash
+  changed_when: false
+  loop: "{{ nvm_node_versions }}"
+
+- name: Verificar alias default
+  shell: |
+    source {{ home_dir }}/.nvm/nvm.sh
+    nvm alias default
+  args:
+    executable: /bin/bash
+  register: nvm_alias
+  changed_when: false
+
+- name: Ajustar alias default do NVM
+  shell: |
+    source {{ home_dir }}/.nvm/nvm.sh
+    nvm alias default {{ node_default_version }}
+  args:
+    executable: /bin/bash
+  when: "'{{ node_default_version }}' not in nvm_alias.stdout"

@@ -1,0 +1,4 @@
+- name: Instalar pacotes base
+  apt:
+    name: "{{ apt_packages_list }}"
+    state: present

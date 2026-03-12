@@ -1,0 +1,43 @@
+- name: Instalar Zsh
+  apt:
+    name: zsh
+    state: present
+
+- name: Verificar se Oh My Zsh já está instalado
+  stat:
+    path: /home/{{ansible_user}}/.oh-my-zsh
+  register: ohmyzsh_dir
+  become: false
+
+- name: Instalar Oh My Zsh
+  shell: sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+  become: true
+  become_user: "{{ansible_user}}"
+  when: not ohmyzsh_dir.stat.exists
+
+- name: Verificar se zsh-autosuggestions já está instalado
+  stat:
+    path: /home/{{ansible_user}}/.oh-my-zsh/custom/plugins/zsh-autosuggestions
+  register: zsh_autosuggestions
+  become: false
+
+- name: Instalar zsh-autosuggestions
+  git:
+    repo: https://github.com/zsh-users/zsh-autosuggestions
+    dest: /home/{{ansible_user}}/.oh-my-zsh/custom/plugins/zsh-autosuggestions
+  become: true
+  become_user: "{{ansible_user}}"
+  when: not zsh_autosuggestions.stat.exists
+
+- name: Habilitar plugins no .zshrc
+  lineinfile:
+    path: /home/{{ansible_user}}/.zshrc
+    regexp: '^plugins='
+    line: 'plugins=(git zsh-autosuggestions)'
+  become: true
+  become_user: "{{ansible_user}}"
+
+- name: Definir Zsh como shell padrão
+  user:
+    name: "{{ ansible_user }}"
+    shell: /usr/bin/zsh

@@ -1,0 +1,82 @@
+apt_packages_list:
+  - software-properties-common
+  - apt-transport-https
+  - ca-certificates
+  - curl
+  - gnupg
+  - lsb-release
+  - git
+  - ubuntu-restricted-extras
+  - ubuntu-restricted-addons
+  - geany
+  - meld
+  - wget
+  - fonts-firacode
+  - fonts-powerline
+  - fonts-jetbrains-mono
+  - gnome-tweaks
+  - vlc
+  - gimp
+  - inkscape
+  - gparted
+  - stacer
+  - cpu-x
+  - htop
+  - terminator
+  - tilix
+  - zsh
+  - unzip
+  - build-essential
+  - vim
+sdkman_java_versions:
+  - 7.0.352-zulu
+  - 8.0.482-zulu
+  - 11.0.30-zulu
+  - 17.0.18-zulu
+  - 21.0.10-zulu
+  - 25.0.2-zulu
+sdkman_default_java: 25.0.2-zulu
+sdkman_maven_versions:
+  - 3.6.3
+  - 3.9.12
+maven_default_version: 3.9.12
+nvm_node_versions:
+  - v8.17.0
+  - v10.24.1
+  - v12.22.12
+  - v20.12.2
+  - v24.14.0
+  - lts/*
+  - node
+node_default_version: v24.14.0
+vscode_extensions:
+  - amazonwebservices.amazon-q-vscode
+  - EditorConfig.EditorConfig
+  - dbaeumer.vscode-eslint
+  - vscjava.vscode-java-pack
+  - mhutchie.git-graph
+  - donjayamanne.githistory
+  - eamodio.gitlens
+  - yzane.markdown-pdf
+  - PKief.material-icon-theme
+  - rocketseat.theme-omni
+  - esbenp.prettier-vscode
+  - humao.rest-client
+  - SonarSource.sonarlint-vscode
+  - vscjava.vscode-spring-boot-dashboard
+  - bradlc.vscode-tailwindcss
+  - Vue.volar
+  - redhat.vscode-xml
+  - redhat.vscode-yaml
+beekeeper_studio: 5.6.0
+keystore_explorer: 5.5.3
+nvm: v0.40.4
+user: richard
+meslo_font_url_base: https://github.com/romkatv/powerlevel10k-media/raw/master
+meslo_font_dest_dir: /home/richard/.local/share/fonts
+meslo_font_files:
+  - "MesloLGS NF Regular.ttf"
+  - "MesloLGS NF Bold.ttf"
+  - "MesloLGS NF Italic.ttf"
+  - "MesloLGS NF Bold Italic.ttf"
+home_dir: /home/richard

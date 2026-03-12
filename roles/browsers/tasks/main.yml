@@ -1,0 +1,3 @@
+- import_tasks: chrome.yml
+- import_tasks: edge.yml
+- import_tasks: brave.yml

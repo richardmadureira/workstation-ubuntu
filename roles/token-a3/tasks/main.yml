@@ -1,0 +1,64 @@
+- name: Instalar pacotes necessários
+  apt:
+    name:
+      - pcscd
+      - pcsc-tools
+      - opensc
+      - libccid
+      - libnss3-tools
+    state: present
+    update_cache: yes
+
+- name: Habilitar serviço pcscd
+  service:
+    name: pcscd
+    state: started
+    enabled: yes
+
+- name: Verificar se driver PKCS11 já existe
+  stat:
+    path: "/usr/lib/libcastle.so.1.0.0"
+  register: pkcs11_driver
+
+- name: Baixar driver Feitian
+  get_url:
+    url: "https://github.com/richardmadureira/drivers/raw/refs/heads/main/libcastle.so.1.0.0"
+    dest: "/usr/lib/libcastle.so.1.0.0"
+  when: not pkcs11_driver.stat.exists
+
+- name: Criar banco NSS do usuário
+  become: false
+  file:
+    path: "{{ home_dir }}/.pki/nssdb"
+    state: directory
+    mode: "0700"
+
+- name: Verificar se banco NSS já existe
+  become: false
+  stat:
+    path: "{{ home_dir }}/.pki/nssdb/cert9.db"
+  register: nss_db
+
+- name: Inicializar banco NSS
+  become: false
+  command: certutil -N -d sql:{{ home_dir }}/.pki/nssdb --empty-password
+  when: not nss_db.stat.exists
+
+- name: Verificar se módulo PKCS11 já está registrado
+  become: false
+  shell: |
+    modutil -dbdir sql:{{ home_dir }}/.pki/nssdb -list | grep ePass2003
+  register: pkcs11_module
+  failed_when: false
+  changed_when: false
+
+- name: Registrar módulo PKCS11
+  become: false
+  command: >
+    modutil -dbdir sql:{{ home_dir }}/.pki/nssdb
+    -add ePass2003
+    -libfile /usr/lib/libcastle.so.1.0.0
+    -force
+  when: pkcs11_module.rc != 0
+
+

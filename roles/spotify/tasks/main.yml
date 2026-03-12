@@ -1,0 +1,30 @@
+- name: Instalar dependências para APT via HTTPS
+  become: true
+  ansible.builtin.apt:
+    name:
+      - curl
+      - gnupg
+      - apt-transport-https
+    state: present
+    update_cache: yes
+
+- name: Adicionar chave GPG do Spotify
+  become: true
+  ansible.builtin.shell: |
+    curl -sS https://download.spotify.com/debian/pubkey_5384CE82BA52C83A.asc | sudo gpg --dearmor --yes -o /etc/apt/trusted.gpg.d/spotify.gpg
+  args:
+    creates: /etc/apt/trusted.gpg.d/spotify.gpg
+
+- name: Adicionar repositório do Spotify
+  become: true
+  ansible.builtin.apt_repository:
+    repo: "deb [signed-by=/etc/apt/trusted.gpg.d/spotify.gpg] http://repository.spotify.com stable non-free"
+    filename: spotify
+    state: present
+
+- name: Instalar Spotify
+  become: true
+  ansible.builtin.apt:
+    name: spotify-client
+    state: present
+    update_cache: yes

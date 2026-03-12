@@ -1,0 +1,41 @@
+---
+- name: Listar versões Java instaladas no diretório do SDKMAN
+  become: true
+  become_user: "{{ user }}"
+  ansible.builtin.find:
+    paths: "{{ home_dir }}/.sdkman/candidates/java"
+    file_type: directory
+    recurse: no
+  register: java_dirs
+
+- name: Definir lista de versões instaladas
+  become: true
+  become_user: "{{ user }}"
+  ansible.builtin.set_fact:
+    installed_versions_list: "{{ java_dirs.files | map(attribute='path') | map('basename') | list }}"
+
+- name: Instalar versões Java faltantes
+  become: true
+  become_user: "{{ user }}"
+  ansible.builtin.shell: |
+    source "{{ home_dir }}/.sdkman/bin/sdkman-init.sh"
+    export sdkman_auto_answer=true
+    sdk install java {{ item }}
+  args:
+    executable: /bin/bash
+  loop: "{{ sdkman_java_versions }}"
+  # A comparação agora é feita entre duas listas reais, o que é mais preciso
+  when: item not in installed_versions_list
+
+- name: Configurar a versão do Java padrão
+  become: true
+  become_user: "{{ user }}"
+  ansible.builtin.shell: |
+    source "{{ home_dir }}/.sdkman/bin/sdkman-init.sh"
+    sdk default java {{ sdkman_default_java }}
+  args:
+    executable: /bin/bash
+  # Esta task só corre se a versão padrão atual for diferente da desejada
+  # ou podes deixar correr sempre para garantir o estado.
+  register: sdk_default_output
+  changed_when: "'Default java set to' in sdk_default_output.stdout"

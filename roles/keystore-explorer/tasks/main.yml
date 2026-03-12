@@ -1,0 +1,8 @@
+- name: Baixar KeyStore Explorer
+  get_url:
+    url: https://github.com/kaikramer/keystore-explorer/releases/download/v{{keystore_explorer}}/kse_{{keystore_explorer}}_all.deb
+    dest: /tmp/keystore-explorer-{{keystore_explorer}}.deb
+
+- name: Instalar KeyStore Explorer
+  apt:
+    deb: /tmp/keystore-explorer-{{keystore_explorer}}.deb

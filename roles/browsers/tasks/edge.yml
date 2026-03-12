@@ -1,0 +1,34 @@
+- name: Verificar se a chave do Microsoft Edge já existe
+  ansible.builtin.stat:
+    path: /usr/share/keyrings/microsoft-edge.gpg
+  register: edge_key
+
+- name: Baixar chave GPG do Microsoft Edge
+  ansible.builtin.get_url:
+    url: https://packages.microsoft.com/keys/microsoft.asc
+    dest: /tmp/microsoft-edge.asc
+    mode: '0644'
+  when: not edge_key.stat.exists
+
+- name: Converter chave para formato gpg (keyring)
+  ansible.builtin.command:
+    cmd: gpg --dearmor -o /usr/share/keyrings/microsoft-edge.gpg /tmp/microsoft-edge.asc
+  when: not edge_key.stat.exists
+
+- name: Remover chave temporária
+  ansible.builtin.file:
+    path: /tmp/microsoft-edge.asc
+    state: absent
+  when: not edge_key.stat.exists
+
+# - name: Adicionar repositório Microsoft Edge
+#   ansible.builtin.apt_repository:
+#     repo: "deb [arch=amd64 signed-by=/usr/share/keyrings/microsoft-edge.gpg] https://packages.microsoft.com/repos/edge stable main"
+#     filename: microsoft-edge
+#     state: present
+#     update_cache: yes
+
+- name: Instalar Microsoft Edge
+  ansible.builtin.apt:
+    name: microsoft-edge-stable
+    state: present

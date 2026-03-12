@@ -1,0 +1,14 @@
+- name: Obter extensões já instaladas
+  become: true
+  become_user: richard
+  command: /usr/bin/code --list-extensions
+  register: vscode_installed_extensions
+  changed_when: false
+  failed_when: false
+
+- name: Instalar extensões VSCode
+  become: true
+  become_user: richard
+  command: /usr/bin/code --install-extension {{ item }}
+  loop: "{{ vscode_extensions }}"
+  when: (item | lower) not in (vscode_installed_extensions.stdout_lines | map('lower') | list)

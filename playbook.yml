@@ -1,0 +1,23 @@
+- name: Configurar Desktop Ubuntu 26.04
+  hosts: all
+  become: true
+  become_method: sudo
+  become_flags: ""
+  roles:
+    # - common # ok
+    # - apt_packages # ok
+    # - zsh # ok
+    # - fonts # ok
+    # - powerlevel10k # ok
+    # - browsers # ok
+    # - vscode # ok
+    # - beekeeper # ok
+    # - keystore-explorer # ok
+    # - sdkman # ok
+    # - nvm # ok
+    # - spotify # ok
+    - docker
+    # - gitconfig # ok
+    # - gsettings
+    # - token-a3
+    

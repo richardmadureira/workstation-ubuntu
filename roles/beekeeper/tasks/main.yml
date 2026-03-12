@@ -1,0 +1,8 @@
+- name: Baixar Beekeeper Studio
+  get_url:
+    url: https://github.com/beekeeper-studio/beekeeper-studio/releases/download/v{{beekeeper_studio}}/beekeeper-studio_{{beekeeper_studio}}_amd64.deb
+    dest: /tmp/beekeeper-{{beekeeper_studio}}.deb
+
+- name: Instalar Beekeeper Studio
+  apt:
+    deb: /tmp/beekeeper-{{beekeeper_studio}}.deb

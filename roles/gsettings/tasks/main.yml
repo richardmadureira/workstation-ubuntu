@@ -1,0 +1,107 @@
+- name: Verificar posição atual do dock
+  become_user: "{{ user }}"
+  ansible.builtin.command: gsettings get org.gnome.shell.extensions.dash-to-dock dock-position
+  register: dock_position
+  changed_when: false
+
+- name: Alterar dock para bottom
+  become_user: "{{ user }}"
+  ansible.builtin.command: gsettings set org.gnome.shell.extensions.dash-to-dock dock-position BOTTOM
+  when: dock_position.stdout != "'BOTTOM'"
+
+
+- name: Verificar cor de realce atual
+  become_user: "{{ user }}"
+  ansible.builtin.command: gsettings get org.gnome.desktop.interface accent-color
+  register: accent_color
+  changed_when: false
+
+- name: Definir cor de realce
+  become_user: "{{ user }}"
+  ansible.builtin.command: gsettings set org.gnome.desktop.interface accent-color 'blue'
+  when: accent_color.stdout != "'blue'"
+
+- name: Verificar se modo painel está ativo
+  become_user: "{{ user }}"
+  ansible.builtin.command: gsettings get org.gnome.shell.extensions.dash-to-dock extend-height
+  register: dock_panel
+  changed_when: false
+
+- name: Ativar modo painel do dock
+  become_user: "{{ user }}"
+  ansible.builtin.command: gsettings set org.gnome.shell.extensions.dash-to-dock extend-height false
+  when: dock_panel.stdout != "false"
+
+- name: Verificar dock-fixed
+  become_user: "{{ user }}"
+  command: gsettings get org.gnome.shell.extensions.dash-to-dock dock-fixed
+  register: dock_fixed
+  changed_when: false
+
+- name: Desabilitar dock fixo
+  become_user: "{{ user }}"
+  command: gsettings set org.gnome.shell.extensions.dash-to-dock dock-fixed false
+  when: dock_fixed.stdout != "false"
+
+- name: Verificar autohide
+  become_user: "{{ user }}"
+  command: gsettings get org.gnome.shell.extensions.dash-to-dock autohide
+  register: dock_autohide
+  changed_when: false
+
+- name: Ativar autohide
+  become_user: "{{ user }}"
+  command: gsettings set org.gnome.shell.extensions.dash-to-dock autohide true
+  when: dock_autohide.stdout != "true"
+
+- name: Verificar se dock aparece em todos os monitores
+  become_user: "{{ user }}"
+  ansible.builtin.command: >
+    gsettings get org.gnome.shell.extensions.dash-to-dock multi-monitor
+  register: dock_multimonitor
+  changed_when: false
+
+- name: Ativar dock em todos os monitores
+  become_user: "{{ user }}"
+  ansible.builtin.command: >
+    gsettings set org.gnome.shell.extensions.dash-to-dock multi-monitor true
+  when: dock_multimonitor.stdout != "true"
+
+- name: Verificar tamanho atual dos ícones do dock
+  become_user: "{{ user }}"
+  ansible.builtin.command: >
+    gsettings get org.gnome.shell.extensions.dash-to-dock dash-max-icon-size
+  register: dock_icon_size
+  changed_when: false
+
+- name: Ajustar tamanho dos ícones do dock
+  become_user: "{{ user }}"
+  ansible.builtin.command: >
+    gsettings set org.gnome.shell.extensions.dash-to-dock dash-max-icon-size 40
+  when: dock_icon_size.stdout != "40"
+
+- name: Verificar se segundos estão sendo exibidos
+  become_user: "{{ user }}"
+  ansible.builtin.command: >
+    gsettings get org.gnome.desktop.interface clock-show-seconds
+  register: show_seconds
+  changed_when: false
+
+- name: Habilitar exibição de segundos
+  become_user: "{{ user }}"
+  ansible.builtin.command: >
+    gsettings set org.gnome.desktop.interface clock-show-seconds true
+  when: show_seconds.stdout != "true"
+
+- name: Verificar se dia da semana está sendo exibido
+  become_user: "{{ user }}"
+  ansible.builtin.command: >
+    gsettings get org.gnome.desktop.interface clock-show-weekday
+  register: show_weekday
+  changed_when: false
+
+- name: Habilitar exibição de dia da semana
+  become_user: "{{ user }}"
+  ansible.builtin.command: >
+    gsettings set org.gnome.desktop.interface clock-show-weekday true
+  when: show_weekday.stdout != "true"
