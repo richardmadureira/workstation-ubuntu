@@ -1,5 +1,4 @@
 - name: Instalar NVM
-  become: true
   become_user: "{{ user }}"
   shell: |
     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/{{nvm}}/install.sh | bash
@@ -7,7 +6,6 @@
     creates: "{{ home_dir }}/.nvm"
 
 - name: Instalar versões Node
-  become: true
   become_user: "{{ user }}"
   shell: |
     export NVM_DIR="{{ home_dir }}/.nvm"

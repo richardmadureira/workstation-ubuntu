@@ -3,15 +3,18 @@
     curl https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > /usr/share/keyrings/vscode.gpg
   args:
     creates: /usr/share/keyrings/vscode.gpg
+  become: true
 
 - name: Adicionar repo VSCode
   copy:
     dest: /etc/apt/sources.list.d/vscode.list
     content: |
       deb [arch=amd64 signed-by=/usr/share/keyrings/vscode.gpg] https://packages.microsoft.com/repos/code stable main
+  become: true
 
 - name: Instalar VSCode
   apt:
     name: code
     update_cache: yes
     state: present
+  become: true

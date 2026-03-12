@@ -2,11 +2,9 @@
   stat:
     path: "{{home_dir}}/.sdkman"
   register: sdkman_dir
-  become: true
   become_user: "{{ user }}"
 
 - name: Instalar SDKMAN
-  become: true
   become_user: "{{ user }}"
   shell: curl -s "https://get.sdkman.io" | bash
   when: not sdkman_dir.stat.exists

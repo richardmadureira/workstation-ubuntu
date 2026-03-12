@@ -1,5 +1,4 @@
 - name: Garantir que o diretório de fontes do usuário existe
-  become: true
   become_user: "{{ user }}"
   ansible.builtin.file:
     path: "{{ meslo_font_dest_dir }}"
@@ -7,7 +6,6 @@
     mode: '0755'
 
 - name: Verificar se as fontes MesloLGS NF já estão instaladas
-  become: true
   become_user: "{{ user }}"
   ansible.builtin.stat:
     path: "{{ meslo_font_dest_dir }}/{{ item }}"
@@ -15,7 +13,6 @@
   loop: "{{ meslo_font_files }}"
 
 - name: Baixar as fontes MesloLGS NF (apenas se não existirem)
-  become: true
   become_user: "{{ user }}"
   ansible.builtin.get_url:
     url: "{{ meslo_font_url_base }}/{{ item.item | replace(' ', '%20') }}"
@@ -26,7 +23,6 @@
   register: download_fonts
 
 - name: Atualizar o cache de fontes do sistema
-  become: true
   become_user: "{{ user }}"
   ansible.builtin.command: fc-cache -fv
   when: download_fonts.changed

@@ -14,6 +14,7 @@
   ansible.builtin.command:
     cmd: gpg --dearmor -o /usr/share/keyrings/microsoft-edge.gpg /tmp/microsoft-edge.asc
   when: not edge_key.stat.exists
+  become: true
 
 - name: Remover chave temporária
   ansible.builtin.file:
@@ -32,3 +33,4 @@
   ansible.builtin.apt:
     name: microsoft-edge-stable
     state: present
+  become: true

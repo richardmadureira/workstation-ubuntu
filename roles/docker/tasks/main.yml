@@ -5,17 +5,20 @@
       - curl
       - gnupg
     state: present
+  become: true
 
 - name: Criar diretório para chaves APT
   file:
     path: /etc/apt/keyrings
     state: directory
     mode: '0755'
+  become: true
 
 - name: Adicionar chave GPG do Docker
   shell: curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
   args:
     creates: /etc/apt/keyrings/docker.gpg
+  become: true
 
 - name: Adicionar repositório Docker
   # descomentar essa linha quando o docker possuir o repositorio oficial (quando lançar o beta do ubuntu 26.04)
@@ -23,8 +26,10 @@
   shell: echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu noble stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
   args:
     creates: /etc/apt/sources.list.d/docker.list
+  become: true
 
 - name: Instalar Docker CE
+  become: true
   apt:
     name:
       - docker-ce
@@ -36,12 +41,14 @@
     update_cache: yes
 
 - name: Habilitar serviço Docker
+  become: true
   systemd:
     name: docker
     enabled: true
     state: started
 
 - name: Adicionar usuário ao grupo docker
+  become: true
   user:
     name: "{{ ansible_user }}"
     groups: docker

@@ -6,3 +6,4 @@
 - name: Instalar KeyStore Explorer
   apt:
     deb: /tmp/keystore-explorer-{{keystore_explorer}}.deb
+  become: true

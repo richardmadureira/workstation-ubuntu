@@ -3,15 +3,18 @@
     curl -fsSLo /usr/share/keyrings/brave-browser-archive-keyring.gpg https://brave-browser-apt-release.s3.brave.com/brave-browser-archive-keyring.gpg
   args:
     creates: /usr/share/keyrings/brave-browser-archive-keyring.gpg
+  become: true
 
 - name: Adicionar repo Brave
   copy:
     dest: /etc/apt/sources.list.d/brave-browser-release.list
     content: |
       deb [signed-by=/usr/share/keyrings/brave-browser-archive-keyring.gpg] https://brave-browser-apt-release.s3.brave.com/ stable main
+  become: true
 
 - name: Instalar Brave
   apt:
     name: brave-browser
     update_cache: yes
     state: present
+  become: true

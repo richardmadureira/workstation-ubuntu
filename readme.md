@@ -5,15 +5,10 @@ ansible-playbook playbook.yml -k
 
 ### Rodar nos hosts remotos
 ```bash
-ansible-playbook playbook.yml --limit dev-desktop
+ansible-playbook playbook.yml --limit dev-desktop -k
 ```
 
 ### Rodar no host local
 ```bash
-ansible-playbook playbook.yml --limit localhost
-```
-
-### Comando que estava utilizando para rodar remotamente no notebook com ubuntu 26.04
-```
-ansible-playbook playbook.yml --limit dev-desktop -k -K
+ansible-playbook playbook.yml --limit localhost -k
 ```

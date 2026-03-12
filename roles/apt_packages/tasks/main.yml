@@ -2,3 +2,4 @@
   apt:
     name: "{{ apt_packages_list }}"
     state: present
+  become: true

@@ -6,8 +6,8 @@
     name: '{{ item.name }}'
     value: '{{ item.value }}'
   loop:
-    - { name: 'user.name', value: 'Richard Mendes Madureira' }
-    - { name: 'user.email', value: 'richard.madureira@dataprev.gov.br' }
+    - { name: 'user.name', value: '{{ git_name }}' }
+    - { name: 'user.email', value: '{{ git_email }}' }
     - { name: 'http.sslVerify', value: 'false' }
     - { name: 'credential.helper', value:  'cache --timeout=36000' }
     - { name: 'core.editor', value:  'code --wait --new-window' }
