@@ -16,7 +16,7 @@
     - sdkman # ok
     - nvm # ok
     - spotify # ok
-    - docker
+    - docker # ok
     - gitconfig # ok
     - gsettings
     # - token-a3
