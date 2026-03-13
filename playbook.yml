@@ -20,4 +20,5 @@
     - gitconfig # ok
     - gsettings
     # - token-a3
+    - intellij-idea
     

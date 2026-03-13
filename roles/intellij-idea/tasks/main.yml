@@ -1,0 +1,40 @@
+- name: Definir diretório de instalação do IntelliJ
+  ansible.builtin.set_fact:
+    idea_install_dir: /opt/programas/idea-{{ intellij_idea_version }}
+
+- name: Verificar se IntelliJ já está instalado
+  ansible.builtin.stat:
+    path: "{{ idea_install_dir }}/bin/idea.sh"
+  register: idea_installed
+
+- name: Baixar IntelliJ IDEA
+  ansible.builtin.get_url:
+    url: https://download-cdn.jetbrains.com/idea/idea-{{ intellij_idea_version }}.tar.gz
+    dest: "/tmp/idea-{{ intellij_idea_version }}.tar.gz"
+    mode: '0644'
+  when: not idea_installed.stat.exists
+
+- name: Criar diretório de instalação
+  become: true
+  ansible.builtin.file:
+    path: "{{ idea_install_dir }}"
+    state: directory
+    mode: '0755'
+    owner: "{{ user }}"
+    group: "{{ user }}"
+  when: not idea_installed.stat.exists
+
+- name: Extrair IntelliJ IDEA
+  ansible.builtin.unarchive:
+    src: "/tmp/idea-{{ intellij_idea_version }}.tar.gz"
+    dest: "{{ idea_install_dir }}"
+    remote_src: true
+    extra_opts: [--strip-components=1]
+  when: not idea_installed.stat.exists
+
+- name: Criar link simbólico para o executável
+  ansible.builtin.file:
+    src: "{{ idea_install_dir }}/bin/idea.sh"
+    dest: /usr/local/bin/idea
+    state: link
+  when: not idea_installed.stat.exists

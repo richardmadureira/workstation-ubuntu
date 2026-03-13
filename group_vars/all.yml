@@ -82,3 +82,6 @@ meslo_font_files:
 home_dir: /home/richard
 git_name: Richard Mendes Madureira
 git_email: richard.madureira@dataprev.gov.br
+
+intellij_idea_version: 2025.3.3
+terminal_font: MesloLGS NF Regular 16
