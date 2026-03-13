@@ -1,9 +1,39 @@
-- name: Baixar Beekeeper Studio
-  get_url:
-    url: https://github.com/beekeeper-studio/beekeeper-studio/releases/download/v{{beekeeper_studio}}/beekeeper-studio_{{beekeeper_studio}}_amd64.deb
-    dest: /tmp/beekeeper-{{beekeeper_studio}}.deb
-
-- name: Instalar Beekeeper Studio
-  apt:
-    deb: /tmp/beekeeper-{{beekeeper_studio}}.deb
+- name: Beekeeper Studio - Garantir diretório de keyrings
   become: true
+  ansible.builtin.file:
+    path: /usr/share/keyrings
+    state: directory
+    mode: "0755"
+
+- name: Beekeeper Studio - Baixar chave GPG do Beekeeper
+  become: true
+  ansible.builtin.get_url:
+    url: https://deb.beekeeperstudio.io/beekeeper.key
+    dest: /tmp/beekeeper.key
+    mode: "0644"
+
+- name: Beekeeper Studio - Converter chave para formato gpg
+  become: true
+  ansible.builtin.command:
+    cmd: gpg --dearmor -o /usr/share/keyrings/beekeeper.gpg /tmp/beekeeper.key
+    creates: /usr/share/keyrings/beekeeper.gpg
+
+- name: Beekeeper Studio - Garantir permissão correta da chave
+  become: true
+  ansible.builtin.file:
+    path: /usr/share/keyrings/beekeeper.gpg
+    mode: "0644"
+
+- name: Beekeeper Studio - Adicionar repositório do Beekeeper
+  become: true
+  ansible.builtin.apt_repository:
+    repo: "deb [signed-by=/usr/share/keyrings/beekeeper.gpg] https://deb.beekeeperstudio.io stable main"
+    filename: beekeeper-studio-app
+    state: present
+
+- name: Instalar pacote beekeeper-studio
+  become: true
+  ansible.builtin.apt:
+    name: beekeeper-studio
+    state: present
+    update_cache: true

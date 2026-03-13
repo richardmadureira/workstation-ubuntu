@@ -18,7 +18,7 @@
     - spotify # ok
     - docker # ok
     - gitconfig # ok
-    - gsettings
+    - gsettings # ok
     # - token-a3
     - intellij-idea
     
