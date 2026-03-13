@@ -31,4 +31,4 @@
     nvm alias default {{ node_default_version }}
   args:
     executable: /bin/bash
-  when: "'{{ node_default_version }}' not in nvm_alias.stdout"
+  when: node_default_version not in nvm_alias.stdout
