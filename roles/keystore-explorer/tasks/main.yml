@@ -1,9 +1,31 @@
-- name: Baixar KeyStore Explorer
-  get_url:
-    url: https://github.com/kaikramer/keystore-explorer/releases/download/v{{keystore_explorer}}/kse_{{keystore_explorer}}_all.deb
-    dest: /tmp/keystore-explorer-{{keystore_explorer}}.deb
+- name: Obter última versão do KeyStore Explorer
+  ansible.builtin.uri:
+    url: https://api.github.com/repos/kaikramer/keystore-explorer/releases/latest
+    return_content: true
+  register: kse_release
 
-- name: Instalar KeyStore Explorer
-  apt:
-    deb: /tmp/keystore-explorer-{{keystore_explorer}}.deb
+- name: Definir variáveis da versão
+  ansible.builtin.set_fact:
+    kse_version: "{{ kse_release.json.tag_name | regex_replace('^v', '') }}"
+    kse_deb: "kse_{{ kse_release.json.tag_name | regex_replace('^v', '') }}_all.deb"
+    kse_url: "https://github.com/kaikramer/keystore-explorer/releases/download/{{ kse_release.json.tag_name }}/kse_{{ kse_release.json.tag_name | regex_replace('^v', '') }}_all.deb"
+
+- name: Verificar versão instalada
+  ansible.builtin.command: dpkg-query -W -f='${Version}' kse
+  register: kse_installed
+  failed_when: false
+  changed_when: false
+
+- name: Baixar pacote mais recente
+  ansible.builtin.get_url:
+    url: "{{ kse_url }}"
+    dest: "/tmp/{{ kse_deb }}"
+    mode: "0644"
+  when: kse_installed.stdout != kse_version
+
+- name: Instalar ou atualizar KeyStore Explorer
   become: true
+  ansible.builtin.apt:
+    deb: "/tmp/{{ kse_deb }}"
+    state: present
+  when: kse_installed.stdout != kse_version
