@@ -114,8 +114,10 @@
 
 - name: Configurar atalhos
   become_user: "{{ user }}"
-  ansible.builtin.command: gsettings set org.gnome.shell favorite-apps "['org.gnome.Nautilus.desktop','org.gnome.Ptyxis.desktop','terminator.desktop','firefox_firefox.desktop','google-chrome.desktop','microsoft-edge.desktop','brave-browser.desktop','code.desktop','beekeeper-studio.desktop','org.gnome.Meld.desktop','geany.desktop','kse.desktop']"
-  when: favorite_apps_atual.stdout != "['org.gnome.Nautilus.desktop','org.gnome.Ptyxis.desktop','terminator.desktop','firefox_firefox.desktop','google-chrome.desktop','microsoft-edge.desktop','brave-browser.desktop','code.desktop','beekeeper-studio.desktop','org.gnome.Meld.desktop','geany.desktop','kse.desktop']"
+  ansible.builtin.command: >
+    gsettings set org.gnome.shell favorite-apps
+    "{{ favorite_apps_desejados }}"
+  when: (favorite_apps_atual.stdout | from_yaml) != favorite_apps_desejados
 
 - name: Verificar se está utilizando fontes do sistema
   become_user: "{{ user }}"

@@ -85,3 +85,17 @@ git_email: richard.madureira@dataprev.gov.br
 
 intellij_idea_version: 2025.3.3
 terminal_font: MesloLGS NF Regular 16
+
+favorite_apps_desejados:
+  - org.gnome.Nautilus.desktop
+  - org.gnome.Ptyxis.desktop
+  - terminator.desktop
+  - firefox_firefox.desktop
+  - google-chrome.desktop
+  - microsoft-edge.desktop
+  - brave-browser.desktop
+  - code.desktop
+  - beekeeper-studio.desktop
+  - org.gnome.Meld.desktop
+  - geany.desktop
+  - kse.desktop
