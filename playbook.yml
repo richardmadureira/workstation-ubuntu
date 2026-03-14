@@ -12,6 +12,7 @@
     - browsers # ok
     - vscode # ok
     - beekeeper # ok
+    - dbeaver #ok
     - keystore-explorer # ok
     - sdkman # ok
     - nvm # ok
