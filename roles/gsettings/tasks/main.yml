@@ -155,3 +155,16 @@
   ansible.builtin.command: >
     gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
   when: color_scheme.stdout != 'prefer-dark'
+
+- name: Verificar posição do dock
+  become_user: "{{ user }}"
+  ansible.builtin.command: >
+    gsettings get org.gnome.shell.extensions.dash-to-dock dock-position
+  register: dock_position_final
+  changed_when: false
+
+- name: Alterar a posição do dock para bottom
+  become_user: "{{ user }}"
+  ansible.builtin.command: >
+    gsettings set org.gnome.shell.extensions.dash-to-dock dock-position BOTTOM
+  when: dock_position_final.stdout != "'BOTTOM'"
