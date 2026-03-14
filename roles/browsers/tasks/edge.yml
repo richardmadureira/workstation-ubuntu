@@ -1,36 +1,36 @@
-- name: Verificar se a chave do Microsoft Edge já existe
+- name: Verificar se a chave da Microsoft já existe
   ansible.builtin.stat:
-    path: /usr/share/keyrings/microsoft-edge.gpg
-  register: edge_key
+    path: /usr/share/keyrings/microsoft.gpg
+  register: microsoft_key
 
-- name: Baixar chave GPG do Microsoft Edge
+- name: Baixar chave GPG da Microsoft
   ansible.builtin.get_url:
     url: https://packages.microsoft.com/keys/microsoft.asc
-    dest: /tmp/microsoft-edge.asc
+    dest: /tmp/microsoft.asc
     mode: '0644'
-  when: not edge_key.stat.exists
+  when: not microsoft_key.stat.exists
 
 - name: Converter chave para formato gpg (keyring)
-  ansible.builtin.command:
-    cmd: gpg --dearmor -o /usr/share/keyrings/microsoft-edge.gpg /tmp/microsoft-edge.asc
-  when: not edge_key.stat.exists
   become: true
+  ansible.builtin.command:
+    cmd: gpg --dearmor -o /usr/share/keyrings/microsoft.gpg /tmp/microsoft.asc
+  when: not microsoft_key.stat.exists
 
 - name: Remover chave temporária
   ansible.builtin.file:
-    path: /tmp/microsoft-edge.asc
+    path: /tmp/microsoft.asc
     state: absent
-  when: not edge_key.stat.exists
+  when: not microsoft_key.stat.exists
 
-# - name: Adicionar repositório Microsoft Edge
-#   ansible.builtin.apt_repository:
-#     repo: "deb [arch=amd64 signed-by=/usr/share/keyrings/microsoft-edge.gpg] https://packages.microsoft.com/repos/edge stable main"
-#     filename: microsoft-edge
-#     state: present
-#     update_cache: yes
+- name: Adicionar repo VSCode
+  become: true
+  copy:
+    dest: /etc/apt/sources.list.d/microsoft-edge.list
+    content: |
+      deb [arch=amd64 signed-by=/usr/share/keyrings/microsoft.gpg] https://packages.microsoft.com/repos/edge stable main
 
 - name: Instalar Microsoft Edge
+  become: true
   ansible.builtin.apt:
     name: microsoft-edge-stable
     state: present
-  become: true

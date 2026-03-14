@@ -1,15 +1,32 @@
-- name: Adicionar chave VSCode
-  shell: |
-    curl https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > /usr/share/keyrings/vscode.gpg
-  args:
-    creates: /usr/share/keyrings/vscode.gpg
+- name: Verificar se a chave da Microsoft já existe
+  ansible.builtin.stat:
+    path: /usr/share/keyrings/microsoft.gpg
+  register: microsoft_key
+
+- name: Baixar chave GPG da Microsoft
+  ansible.builtin.get_url:
+    url: https://packages.microsoft.com/keys/microsoft.asc
+    dest: /tmp/microsoft.asc
+    mode: '0644'
+  when: not microsoft_key.stat.exists
+
+- name: Converter chave para formato gpg (keyring)
+  ansible.builtin.command:
+    cmd: gpg --dearmor -o /usr/share/keyrings/microsoft.gpg /tmp/microsoft.asc
+  when: not microsoft_key.stat.exists
   become: true
+
+- name: Remover chave temporária
+  ansible.builtin.file:
+    path: /tmp/microsoft.asc
+    state: absent
+  when: not microsoft_key.stat.exists
 
 - name: Adicionar repo VSCode
   copy:
     dest: /etc/apt/sources.list.d/vscode.list
     content: |
-      deb [arch=amd64 signed-by=/usr/share/keyrings/vscode.gpg] https://packages.microsoft.com/repos/code stable main
+      deb [arch=amd64 signed-by=/usr/share/keyrings/microsoft.gpg] https://packages.microsoft.com/repos/code stable main
   become: true
 
 - name: Instalar VSCode
