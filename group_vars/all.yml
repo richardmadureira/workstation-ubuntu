@@ -23,7 +23,6 @@ apt_packages_list:
   - cpu-x
   - htop
   - terminator
-  - tilix
   - zsh
   - unzip
   - build-essential
