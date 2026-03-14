@@ -143,3 +143,15 @@
   ansible.builtin.command: >
     gsettings set org.gnome.Ptyxis font-name '{{ terminal_font }}'
   when: font_name.stdout | replace("'", "") != terminal_font
+
+- name: Verificar se Modo Dark está habilitado
+  become_user: "{{ user }}"
+  ansible.builtin.command: gsettings get org.gnome.desktop.interface color-scheme
+  register: color_scheme
+  changed_when: false
+
+- name: Alternar para modo DARK
+  become_user: "{{ user }}"
+  ansible.builtin.command: >
+    gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
+  when: color_scheme.stdout != 'prefer-dark'
