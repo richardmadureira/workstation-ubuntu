@@ -9,7 +9,7 @@
   copy:
     dest: /etc/apt/sources.list.d/brave-browser-release.list
     content: |
-      deb [signed-by=/usr/share/keyrings/brave-browser-archive-keyring.gpg] https://brave-browser-apt-release.s3.brave.com/ stable main
+      deb [arch=amd64 signed-by=/usr/share/keyrings/brave-browser-archive-keyring.gpg] https://brave-browser-apt-release.s3.brave.com/ stable main
   become: true
 
 - name: Instalar Brave
