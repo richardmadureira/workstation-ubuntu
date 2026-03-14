@@ -9,7 +9,6 @@
   ansible.builtin.command: gsettings set org.gnome.shell.extensions.dash-to-dock dock-position BOTTOM
   when: dock_position.stdout != "'BOTTOM'"
 
-
 - name: Verificar cor de realce atual
   become_user: "{{ user }}"
   ansible.builtin.command: gsettings get org.gnome.desktop.interface accent-color
@@ -53,6 +52,17 @@
   become_user: "{{ user }}"
   command: gsettings set org.gnome.shell.extensions.dash-to-dock autohide true
   when: dock_autohide.stdout != "true"
+
+- name: Verificar autohide-in-fullscreen
+  become_user: "{{ user }}"
+  command: gsettings get org.gnome.shell.extensions.dash-to-dock autohide-in-fullscreen
+  register: dock_autohide_in_fullscreen
+  changed_when: false
+
+- name: Ativar autohide-in-fullscreen
+  become_user: "{{ user }}"
+  command: gsettings set org.gnome.shell.extensions.dash-to-dock autohide-in-fullscreen true
+  when: dock_autohide_in_fullscreen.stdout != "true"
 
 - name: Verificar se dock aparece em todos os monitores
   become_user: "{{ user }}"
@@ -154,17 +164,4 @@
   become_user: "{{ user }}"
   ansible.builtin.command: >
     gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
-  when: color_scheme.stdout != 'prefer-dark'
-
-- name: Verificar posição do dock
-  become_user: "{{ user }}"
-  ansible.builtin.command: >
-    gsettings get org.gnome.shell.extensions.dash-to-dock dock-position
-  register: dock_position_final
-  changed_when: false
-
-- name: Alterar a posição do dock para bottom
-  become_user: "{{ user }}"
-  ansible.builtin.command: >
-    gsettings set org.gnome.shell.extensions.dash-to-dock dock-position BOTTOM
-  when: dock_position_final.stdout != "'BOTTOM'"
+  when: color_scheme.stdout != "'prefer-dark'"
