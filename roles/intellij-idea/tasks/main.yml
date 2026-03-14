@@ -38,3 +38,20 @@
     dest: /usr/local/bin/idea
     state: link
   when: not idea_installed.stat.exists
+
+- name: Criar arquivo de icone do Intellij Idea
+
+  ansible.builtin.copy:
+    content: |
+      [Desktop Entry]
+      Name=IDEA
+      Comment=IDE de Desenvolvimento Web
+      GenericName=Intellij IDEA
+      Exec=/opt/programas/idea-{{ intellij_idea_version }}/bin/idea.sh
+      Icon=/opt/programas/idea-{{ intellij_idea_version }}/bin/idea.svg
+      Type=Application
+      StartupNotify=false
+      StartupWMClass=jetbrains-idea
+      Categories=Development;IDE;Web
+    dest: "{{ home_dir }}/.local/share/applications/idea.desktop"
+    mode: '0644'
