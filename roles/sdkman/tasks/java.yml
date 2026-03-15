@@ -1,4 +1,3 @@
----
 - name: Listar versões Java instaladas no diretório do SDKMAN
   become_user: "{{ user }}"
   ansible.builtin.find:

@@ -1,10 +1,10 @@
 - name: Listar versões Maven instaladas no diretório do SDKMAN
   ansible.builtin.find:
-    paths: "/home/richard/.sdkman/candidates/maven"
+    paths: "{{home_dir}}/.sdkman/candidates/maven"
     file_type: directory
     recurse: no
   register: maven_dirs
-  become_user: richard
+  become_user: "{{ user }}"
 
 - name: Definir lista de versões Maven instaladas
   ansible.builtin.set_fact:
@@ -12,22 +12,22 @@
 
 - name: Instalar versões Maven faltantes
   ansible.builtin.shell: |
-    source "/home/richard/.sdkman/bin/sdkman-init.sh"
+    source "{{home_dir}}/.sdkman/bin/sdkman-init.sh"
     export sdkman_auto_answer=true
     sdk install maven {{ item }}
   args:
     executable: /bin/bash
-  become_user: richard
+  become_user: "{{ user }}"
   loop: "{{ sdkman_maven_versions }}"
   when: item not in installed_maven_list
 
 - name: Configurar a versão do Maven padrão
   ansible.builtin.shell: |
-    source "/home/richard/.sdkman/bin/sdkman-init.sh"
+    source "{{home_dir}}/.sdkman/bin/sdkman-init.sh"
     sdk default maven {{ maven_default_version }}
   args:
     executable: /bin/bash
-  become_user: richard
+  become_user: "{{ user }}"
   register: maven_default_output
   changed_when: "'Default maven set to' in maven_default_output.stdout"
   when: maven_default_version is defined

@@ -1,4 +1,4 @@
-- name: DBeaver - Baixar chave GPG do DBeaver
+- name: Baixar chave GPG do DBeaver
   become: true
   ansible.builtin.get_url:
     url: https://dbeaver.io/debs/dbeaver.gpg.key
@@ -6,20 +6,20 @@
     mode: '0644'
     force: false
 
-- name: DBeaver - Converter chave para formato gpg (dearmor)
+- name: Converter chave para formato gpg (dearmor)
   become: true
   ansible.builtin.command:
     cmd: gpg --dearmor -o /usr/share/keyrings/dbeaver.gpg /usr/share/keyrings/dbeaver.gpg.key
     creates: /usr/share/keyrings/dbeaver.gpg
 
-- name: DBeaver - Adicionar repositório do DBeaver
+- name: Adicionar repositório do DBeaver
   become: true
   ansible.builtin.apt_repository:
     repo: "deb [signed-by=/usr/share/keyrings/dbeaver.gpg] https://dbeaver.io/debs/dbeaver-ce /"
     filename: dbeaver
     state: present
 
-- name: DBeaver - Instalar DBeaver CE
+- name: Instalar DBeaver CE
   become: true
   ansible.builtin.apt:
     name: dbeaver-ce

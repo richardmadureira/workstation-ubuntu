@@ -1,6 +1,6 @@
 - name: Configuração do git (.gitconfig)
   become: true
-  become_user: richard
+  become_user: "{{ user }}"
   git_config:
     scope: global
     name: '{{ item.name }}'
