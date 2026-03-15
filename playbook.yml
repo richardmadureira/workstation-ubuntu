@@ -19,7 +19,7 @@
     - spotify
     - docker
     - gitconfig
-    # - token-a3
+    - token-a3
     - intellij-idea
     - gsettings
     

@@ -1,11 +1,19 @@
+- name: Executar script de configuração básica
+  ansible.builtin.script: files/config.sh
+  args:
+    creates: /etc/udev/rules.d/epass_token-1.rules
+
 - name: Instalar pacotes necessários
   apt:
     name:
       - pcscd
-      - pcsc-tools
-      - opensc
       - libccid
+      - libpcsclite1
+      - pcsc-tools
       - libnss3-tools
+      - gnutls-bin
+      - libssl-dev
+      - opensc
     state: present
     update_cache: yes
 
@@ -17,35 +25,35 @@
 
 - name: Verificar se driver PKCS11 já existe
   stat:
-    path: "/usr/lib/libcastle.so.1.0.0"
+    path: /usr/lib/libcastle.so
   register: pkcs11_driver
 
 - name: Baixar driver Feitian
   get_url:
-    url: "https://github.com/richardmadureira/drivers/raw/refs/heads/main/libcastle.so.1.0.0"
-    dest: "/usr/lib/libcastle.so.1.0.0"
+    url: https://github.com/richardmadureira/drivers/raw/refs/heads/main/libcastle.so.1.0.0
+    dest: /usr/lib/libcastle.so
   when: not pkcs11_driver.stat.exists
 
 - name: Criar banco NSS do usuário
-  become: false
+  become: true
+  become_user: "{{ user }}"
   file:
     path: "{{ home_dir }}/.pki/nssdb"
     state: directory
     mode: "0700"
 
 - name: Verificar se banco NSS já existe
-  become: false
   stat:
     path: "{{ home_dir }}/.pki/nssdb/cert9.db"
   register: nss_db
 
 - name: Inicializar banco NSS
-  become: false
+  become: true
+  become_user: "{{ user }}"
   command: certutil -N -d sql:{{ home_dir }}/.pki/nssdb --empty-password
   when: not nss_db.stat.exists
 
 - name: Verificar se módulo PKCS11 já está registrado
-  become: false
   shell: |
     modutil -dbdir sql:{{ home_dir }}/.pki/nssdb -list | grep ePass2003
   register: pkcs11_module
@@ -53,12 +61,11 @@
   changed_when: false
 
 - name: Registrar módulo PKCS11
-  become: false
+  become: true
+  become_user: "{{ user }}"
   command: >
     modutil -dbdir sql:{{ home_dir }}/.pki/nssdb
     -add ePass2003
-    -libfile /usr/lib/libcastle.so.1.0.0
+    -libfile /usr/lib/libcastle.so
     -force
   when: pkcs11_module.rc != 0
-
-
