@@ -1,0 +1,18 @@
+- name: clock-show-seconds - Verificar se a propriedade clock-show-seconds está com o valor padrão
+  become_user: "{{ user }}"
+  ansible.builtin.command: dconf read /org/gnome/desktop/interface/clock-show-seconds
+  register: clock_show_seconds_default
+  changed_when: false
+
+- name: clock-show-seconds - Verificar se segundos estão sendo exibidos
+  become_user: "{{ user }}"
+  ansible.builtin.command: >
+    gsettings get org.gnome.desktop.interface clock-show-seconds
+  register: show_seconds
+  changed_when: false
+
+- name: clock-show-seconds - Habilitar exibição de segundos
+  become_user: "{{ user }}"
+  ansible.builtin.command: >
+    gsettings set org.gnome.desktop.interface clock-show-seconds true
+  when: show_seconds.stdout != "true" or clock_show_seconds_default.stdout == ""

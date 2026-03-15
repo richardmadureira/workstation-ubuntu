@@ -1,0 +1,18 @@
+- name: use-font-system - Verificar se a propriedade use-system-font está com o valor padrão
+  become_user: "{{ user }}"
+  ansible.builtin.command: dconf read /org/gnome/Pytxis/use-system-font
+  register: use_system_font_default
+  changed_when: false
+
+- name: use-font-system - Verificar se está utilizando fontes do sistema
+  become_user: "{{ user }}"
+  ansible.builtin.command: >
+    gsettings get org.gnome.Ptyxis use-system-font
+  register: use_font_system
+  changed_when: false
+
+- name: use-font-system - Desabilitar utilização de fontes do systema
+  become_user: "{{ user }}"
+  ansible.builtin.command: >
+    gsettings set org.gnome.Ptyxis use-system-font false
+  when: use_font_system.stdout != "false" or use_system_font_default.stdout == ""

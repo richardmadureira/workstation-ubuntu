@@ -1,0 +1,11 @@
+- name: font-name - Verificar se a fonte configurada é a MesloLGS NF Regular
+  become_user: "{{ user }}"
+  ansible.builtin.command: gsettings get org.gnome.Ptyxis font-name
+  register: font_name
+  changed_when: false
+
+- name: font-name - Configurar fonte do terminal para '{{ terminal_font }}'
+  become_user: "{{ user }}"
+  ansible.builtin.command: >
+    gsettings set org.gnome.Ptyxis font-name '{{ terminal_font }}'
+  when: font_name.stdout | replace("'", "") != terminal_font

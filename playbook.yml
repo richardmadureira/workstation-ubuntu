@@ -4,22 +4,22 @@
   become_method: sudo
   become_flags: ""
   roles:
-    - common # ok
-    - apt_packages # ok
-    - zsh # ok
-    - fonts # ok
-    - powerlevel10k # ok
-    - browsers # ok
-    - vscode # ok
-    - beekeeper # ok
-    - dbeaver #ok
-    - keystore-explorer # ok
-    - sdkman # ok
-    - nvm # ok
-    - spotify # ok
-    - docker # ok
-    - gitconfig # ok
+    - common
+    - apt_packages
+    - zsh
+    - fonts
+    - powerlevel10k
+    - browsers
+    - vscode
+    - beekeeper
+    - dbeaver
+    - keystore-explorer
+    - sdkman
+    - nvm
+    - spotify
+    - docker
+    - gitconfig
     # - token-a3
     - intellij-idea
-    - gsettings # ok
+    - gsettings
     

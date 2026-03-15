@@ -1,0 +1,12 @@
+- name: multi-monitor - Verificar se dock aparece em todos os monitores
+  become_user: "{{ user }}"
+  ansible.builtin.command: >
+    gsettings get org.gnome.shell.extensions.dash-to-dock multi-monitor
+  register: dock_multimonitor
+  changed_when: false
+
+- name: multi-monitor - Ativar dock em todos os monitores
+  become_user: "{{ user }}"
+  ansible.builtin.command: >
+    gsettings set org.gnome.shell.extensions.dash-to-dock multi-monitor true
+  when: dock_multimonitor.stdout != "true"

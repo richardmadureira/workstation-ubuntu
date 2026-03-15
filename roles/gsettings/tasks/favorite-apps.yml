@@ -1,0 +1,12 @@
+- name: favorite-apps - Ler favoritos atuais
+  become_user: "{{ user }}"
+  ansible.builtin.command: gsettings get org.gnome.shell favorite-apps
+  register: favorite_apps_atual
+  changed_when: false
+
+- name: favorite-apps - Configurar atalhos
+  become_user: "{{ user }}"
+  ansible.builtin.command: >
+    gsettings set org.gnome.shell favorite-apps
+    "{{ favorite_apps_desejados }}"
+  when: (favorite_apps_atual.stdout | from_yaml) != favorite_apps_desejados

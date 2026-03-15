@@ -1,0 +1,17 @@
+- name: color-scheme - Verificar se a propriedade color-scheme está com o valor padrão
+  become_user: "{{ user }}"
+  ansible.builtin.command: dconf read /org/gnome/desktop/interface/accent-color
+  register: color_scheme_default
+  changed_when: false
+
+- name: color-scheme - Verificar se Modo Dark está habilitado
+  become_user: "{{ user }}"
+  ansible.builtin.command: gsettings get org.gnome.desktop.interface color-scheme
+  register: color_scheme
+  changed_when: false
+
+- name: color-scheme - Alternar para modo DARK
+  become_user: "{{ user }}"
+  ansible.builtin.command: >
+    gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
+  when: color_scheme.stdout != "'prefer-dark'" or color_scheme_default.stdout == ""

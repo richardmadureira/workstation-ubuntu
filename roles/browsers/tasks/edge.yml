@@ -14,7 +14,7 @@
   become: true
   ansible.builtin.command:
     cmd: gpg --dearmor -o /usr/share/keyrings/microsoft.gpg /tmp/microsoft.asc
-  when: not microsoft_key.stat.exists
+    creates: /usr/share/keyrings/microsoft.gpg
 
 - name: Remover chave temporária
   ansible.builtin.file:
@@ -22,12 +22,17 @@
     state: absent
   when: not microsoft_key.stat.exists
 
-- name: Adicionar repo VSCode
+- name: Adicionar repo Edge
   become: true
-  copy:
+  ansible.builtin.copy:
     dest: /etc/apt/sources.list.d/microsoft-edge.list
     content: |
       deb [arch=amd64 signed-by=/usr/share/keyrings/microsoft.gpg] https://packages.microsoft.com/repos/edge stable main
+
+- name: Atualizar cache apt
+  become: true
+  ansible.builtin.apt:
+    update_cache: yes
 
 - name: Instalar Microsoft Edge
   become: true

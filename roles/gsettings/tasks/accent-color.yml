@@ -1,0 +1,16 @@
+- name: accent-color - Verificar se a propriedade accent-color está com o valor padrão
+  become_user: "{{ user }}"
+  ansible.builtin.command: dconf read /org/gnome/desktop/interface/accent-color
+  register: accent_color_default
+  changed_when: false
+
+- name: accent-color - Verificar cor de realce atual
+  become_user: "{{ user }}"
+  ansible.builtin.command: gsettings get org.gnome.desktop.interface accent-color
+  register: accent_color
+  changed_when: false
+
+- name: accent-color - Definir cor de realce para azul
+  become_user: "{{ user }}"
+  ansible.builtin.command: gsettings set org.gnome.desktop.interface accent-color 'blue'
+  when: accent_color.stdout != "'blue'" or accent_color_default.stdout == ""
