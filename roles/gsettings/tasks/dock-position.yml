@@ -1,16 +1,16 @@
-- name: dock-position - Verificar se a propriedade está com o valor padrão
+- name: Verificar se a propriedade está com o valor padrão
   become_user: "{{ user }}"
   ansible.builtin.command: dconf read /org/gnome/shell/extensions/dash-to-dock/dock-position
   register: dock_position_default
   changed_when: false
 
-- name: dock-position - Verificar posição atual do dock
+- name: Verificar posição atual do dock
   become_user: "{{ user }}"
   ansible.builtin.command: gsettings get org.gnome.shell.extensions.dash-to-dock dock-position
   register: dock_position
   changed_when: false
   
-- name: dock-position - Alterar dock para bottom
+- name: Alterar dock para bottom
   become_user: "{{ user }}"
   ansible.builtin.command: gsettings set org.gnome.shell.extensions.dash-to-dock dock-position 'BOTTOM'
   when: dock_position.stdout | trim != "'BOTTOM'" or dock_position_default.stdout == ""

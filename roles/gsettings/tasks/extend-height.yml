@@ -1,16 +1,16 @@
-- name: extend-height - Verificar se a propriedade extend-height está com o valor padrão
+- name: Verificar se a propriedade extend-height está com o valor padrão
   become_user: "{{ user }}"
   ansible.builtin.command: dconf read /org/gnome/shell/extensions/dash-to-dock/extend-height
   register: extend_height_default
   changed_when: false
 
-- name: extend-height - Verificar se modo painel está ativo
+- name: Verificar se modo painel está ativo
   become_user: "{{ user }}"
   ansible.builtin.command: gsettings get org.gnome.shell.extensions.dash-to-dock extend-height
   register: dock_panel
   changed_when: false
 
-- name: extend-height - Ativar modo painel do dock
+- name: Ativar modo painel do dock
   become_user: "{{ user }}"
   ansible.builtin.command: gsettings set org.gnome.shell.extensions.dash-to-dock extend-height false
   when: dock_panel.stdout != "false" or extend_height_default.stdout == ""

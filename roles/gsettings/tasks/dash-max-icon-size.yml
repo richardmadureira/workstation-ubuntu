@@ -1,11 +1,11 @@
-- name: dash-max-icon-size - Verificar tamanho atual dos ícones do dock
+- name: Verificar tamanho atual dos ícones do dock
   become_user: "{{ user }}"
   ansible.builtin.command: >
     gsettings get org.gnome.shell.extensions.dash-to-dock dash-max-icon-size
   register: dock_icon_size
   changed_when: false
 
-- name: dash-max-icon-size - Ajustar tamanho dos ícones do dock
+- name: Ajustar tamanho dos ícones do dock
   become_user: "{{ user }}"
   ansible.builtin.command: >
     gsettings set org.gnome.shell.extensions.dash-to-dock dash-max-icon-size 40

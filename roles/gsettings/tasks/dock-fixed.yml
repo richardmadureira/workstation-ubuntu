@@ -1,16 +1,16 @@
-- name: dock-fixed - Verificar se a propriedade audohide-in-fullscreen está com o valor padrão
+- name: Verificar se a propriedade audohide-in-fullscreen está com o valor padrão
   become_user: "{{ user }}"
   ansible.builtin.command: dconf read /org/gnome/shell/extensions/dash-to-dock/dock-fixed
   register: dock_fixed_default
   changed_when: false
 
-- name: dock-fixed - Verificar dock-fixed
+- name: Verificar dock-fixed
   become_user: "{{ user }}"
   command: gsettings get org.gnome.shell.extensions.dash-to-dock dock-fixed
   register: dock_fixed
   changed_when: false
 
-- name: dock-fixed - Desabilitar dock fixo
+- name: Desabilitar dock fixo
   become_user: "{{ user }}"
   command: gsettings set org.gnome.shell.extensions.dash-to-dock dock-fixed false
   when: dock_fixed.stdout != "false" or dock_fixed_default.stdout == ""
