@@ -1,8 +1,3 @@
-- name: Executar script de configuração básica
-  ansible.builtin.script: files/config.sh
-  args:
-    creates: /etc/udev/rules.d/epass_token-1.rules
-
 - name: Instalar pacotes necessários
   apt:
     name:
@@ -14,8 +9,14 @@
       - gnutls-bin
       - libssl-dev
       - opensc
+      - curl
     state: present
     update_cache: yes
+
+- name: Executar script de configuração básica
+  ansible.builtin.script: files/config.sh
+  args:
+    creates: /etc/udev/rules.d/epass_token-1.rules
 
 - name: Habilitar serviço pcscd
   service:
