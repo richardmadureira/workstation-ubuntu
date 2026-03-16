@@ -1,5 +1,11 @@
 # Instruções
 
+Este projeto instala bilbiotecas e aplicativos para o perfil de desenvolvedores.
+Após a instalação do `Ubuntu 26.04`, é necessário instalar o ssh para permitir conexões remotas realizadas pelo ansible. O comando de instalação é:
+```bash
+sudo apt update && sudo apt install ssh -y
+```
+
 ## Observação
 Como o Ubuntu `26.04` possui um novo aplicativo sudo (o sudo-rs, feito em rust), só consegui fazer funcionar com a inclusão do usuário na lista de sudoers assim:
 * Executar o comando `sudo visudo`

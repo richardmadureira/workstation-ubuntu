@@ -1,0 +1,15 @@
+- name: Verificar se rustup existe
+  ansible.builtin.stat:
+    path: "{{ ansible_env.HOME }}/.cargo/bin/rustup"
+  register: rustup_check
+
+- name: Instalar Rust
+  ansible.builtin.shell: |
+    curl https://sh.rustup.rs -sSf | sh -s -- -y
+  when: not rustup_check.stat.exists
+
+- name: Atualizar Rust para a última versão
+  ansible.builtin.command: "{{ ansible_env.HOME }}/.cargo/bin/rustup update"
+  when: rustup_check.stat.exists
+  register: rust_update
+  changed_when: "'unchanged' not in rust_update.stdout"

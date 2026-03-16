@@ -1,0 +1,5 @@
+- name: Atualizar todos os snaps
+  become: true
+  ansible.builtin.command: snap refresh
+  register: snap_refresh
+  changed_when: "'has no updates available' not in snap_refresh.stdout and 'All snaps up to date' not in snap_refresh.stdout"
