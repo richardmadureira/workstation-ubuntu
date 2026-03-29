@@ -70,3 +70,11 @@
     -libfile /usr/lib/libcastle.so
     -force
   when: pkcs11_module.rc != 0
+
+- name: Registrar driver no p11-kit (global)
+  copy:
+    dest: /usr/share/p11-kit/modules/epass2003.module
+    content: |
+      module: /usr/lib/libcastle.so
+      managed: yes
+    mode: '0644'
