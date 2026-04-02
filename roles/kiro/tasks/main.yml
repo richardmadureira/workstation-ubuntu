@@ -1,0 +1,39 @@
+- name: Verificar se a chave da Amazon já existe
+  ansible.builtin.stat:
+    path: /usr/share/keyrings/amazon-kiro.gpg
+  register: kiro_key
+
+- name: Baixar chave GPG da Amazon (Kiro)
+  ansible.builtin.get_url:
+    url: https://kiro.dev/deb/amazon-kiro.gpg
+    dest: /usr/share/keyrings/amazon-kiro.gpg
+    mode: '0644'
+  become: true
+  when: not kiro_key.stat.exists
+
+- name: Adicionar repo Kiro
+  ansible.builtin.copy:
+    dest: /etc/apt/sources.list.d/kiro.list
+    content: |
+      deb [arch=amd64 signed-by=/usr/share/keyrings/amazon-kiro.gpg] https://kiro.dev/deb/ stable main
+  become: true
+
+- name: Instalar Kiro
+  ansible.builtin.apt:
+    name: kiro
+    update_cache: yes
+    state: present
+  become: true
+
+- name: Verificar se kiro-cli está no PATH
+  ansible.builtin.stat:
+    path: /usr/local/bin/kiro
+  register: kiro_cli_link
+
+- name: Criar link simbólico para kiro-cli
+  ansible.builtin.file:
+    src: /usr/share/kiro/bin/kiro
+    dest: /usr/local/bin/kiro
+    state: link
+  become: true
+  # when: not kiro_cli_link.stat.exists
