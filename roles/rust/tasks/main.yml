@@ -1,15 +1,27 @@
 - name: Verificar se rustup existe
   ansible.builtin.stat:
-    path: "{{ ansible_env.HOME }}/.cargo/bin/rustup"
+    path: "{{ home_dir }}/.cargo/bin/rustup"
   register: rustup_check
 
 - name: Instalar Rust
+  become_user: "{{ user }}"
   ansible.builtin.shell: |
     curl https://sh.rustup.rs -sSf | sh -s -- -y
   when: not rustup_check.stat.exists
+  args:
+    executable: /bin/bash
 
 - name: Atualizar Rust para a última versão
-  ansible.builtin.command: "{{ ansible_env.HOME }}/.cargo/bin/rustup update"
+  become_user: "{{ user }}"
+  ansible.builtin.command: "{{ home_dir }}/.cargo/bin/rustup update"
   when: rustup_check.stat.exists
   register: rust_update
   changed_when: "'unchanged' not in rust_update.stdout"
+
+- name: Configurar Rust no .zshrc
+  become_user: "{{ user }}"
+  ansible.builtin.blockinfile:
+    path: "{{ home_dir }}/.zshrc"
+    marker: "# {mark} RUST MANAGED BLOCK"
+    block: |
+      . "{{ home_dir }}/.cargo/env"
