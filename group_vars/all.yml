@@ -29,22 +29,25 @@ apt_packages_list:
   - vim
 sdkman_java_versions:
   - 7.0.352-zulu
-  - 8.0.482-zulu
-  - 11.0.30-zulu
-  - 17.0.18-zulu
-  - 21.0.10-zulu
-  - 25.0.2-zulu
-sdkman_default_java: 25.0.2-zulu
+  - 8.0.492-zulu
+  - 11.0.31-zulu
+  - 17.0.19-zulu
+  - 21.0.11-zulu
+  - 25.0.3-zulu
+sdkman_default_java: 25.0.3-zulu
 sdkman_maven_versions:
   - 3.6.3
-  - 3.9.12
-maven_default_version: 3.9.12
+  - 3.9.15
+maven_default_version: 3.9.15
 nvm_node_versions:
   - v8.17.0
   - v10.24.1
   - v12.22.12
-  - v20.12.2
-  - v24.14.0
+  - v14.21.3
+  - v16.20.1
+  - v18.20.8
+  - v20.22.2
+  - v24.15.0
   - lts/*
   - node
 node_default_version: v24.14.0
@@ -67,7 +70,7 @@ vscode_extensions:
   - Vue.volar
   - redhat.vscode-xml
   - redhat.vscode-yaml
-beekeeper_studio: 5.6.0
+beekeeper_studio: 5.6.5
 keystore_explorer: 5.6.1
 nvm: v0.40.4
 user: richard
@@ -82,7 +85,7 @@ home_dir: /home/richard
 git_name: Richard Mendes Madureira
 git_email: richard.madureira@dataprev.gov.br
 
-intellij_idea_version: 2025.3.3
+intellij_idea_version: 2026.1.1
 terminal_font: MesloLGS NF Regular 16
 
 favorite_apps_desejados:
