@@ -103,3 +103,15 @@ favorite_apps_desejados:
   - org.gnome.Meld.desktop
   - geany.desktop
   - kse.desktop
+
+vpn_command: >
+    sudo valgrind openconnect -b -q portalvpncert.dataprev.gov.br
+    --certificate="pkcs11:model=ePass2003;manufacturer=EnterSafe%00;serial=307B3B228058001F;token=SOLUTI;id=%09%0E%0A%69%00%00%00%00;object=RICHARD%20MENDES%20MADUREIRA%3A03930263610;type=cert"
+    --protocol=gp
+    -u richard.madureira@dataprev.gov.br
+    --servercert pin-sha256:XU0rZPEnB8GhPG+sd//CbY7PAayc4N0khTwqTVzzm/Y=
+    --authgroup=GW_EXT_DCDF_A3
+    --disable-ipv6
+    --no-dtls
+
+vpn_script_path: /usr/local/bin/vpn
