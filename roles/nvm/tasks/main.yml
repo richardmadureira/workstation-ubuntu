@@ -5,6 +5,16 @@
   args:
     creates: "{{ home_dir }}/.nvm"
 
+- name: Configurar NVM no .zshrc
+  blockinfile:
+    path: "{{ home_dir }}/.zshrc"
+    marker: "# {mark} NVM MANAGED BLOCK"
+    block: |
+      export NVM_DIR="{{ home_dir }}/.nvm"
+      [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+      [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+  become_user: "{{ user }}"
+
 - name: Instalar versões Node
   become_user: "{{ user }}"
   shell: |
