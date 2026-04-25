@@ -1,0 +1,24 @@
+- name: Garantir instalação do openconnect
+  package:
+    name: openconnect
+    state: present
+
+- name: Garantir instalação do valgrind (opcional)
+  package:
+    name: valgrind
+    state: present
+
+- name: Criar script da VPN
+  copy:
+    dest: "{{ vpn_script_path }}"
+    mode: '0755'
+    content: |
+      #!/bin/bash
+      {{ vpn_command }}
+
+- name: Garantir alias global 'vpn'
+  copy:
+    dest: /etc/profile.d/vpn_alias.sh
+    mode: '0644'
+    content: |
+      alias vpn="{{ vpn_script_path }}"
